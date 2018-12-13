@@ -75,7 +75,14 @@ public abstract class Advent {
   }
 
   protected void readInput() {
-    String fileName = (dayNumber < 10 ? "0" : "") + dayNumber + ".txt";
+    readInput((dayNumber < 10 ? "0" : "") + dayNumber + ".txt");
+  }
+
+  protected void readExample() {
+    readInput((dayNumber < 10 ? "0" : "") + dayNumber + "_example.txt");
+  }
+
+  protected void readInput(String fileName) {
     try {
       BufferedReader reader = new BufferedReader(new FileReader(fileName));
       input = reader.lines().collect(Collectors.toList());
