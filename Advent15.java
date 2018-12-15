@@ -17,6 +17,10 @@ public class Advent15 extends Advent {
 
   @Override
   protected void parseInput() {
+    parseElfPower(3);
+  }
+
+  private void parseElfPower(int power) {
     //debug = true;
     xMax = input.get(0).length();
     yMax = input.size();
@@ -32,6 +36,7 @@ public class Advent15 extends Advent {
           unit.hp = initialHp;
           unit.c = c;
           unit.position = new Point(x,y);
+          unit.power = c == 'E' ? power : 3;
           units.add(unit);
         }
       }
@@ -66,25 +71,121 @@ public class Advent15 extends Advent {
 
   @Override
   protected String part1() {
-    printAndPause("Initial state");
     int fullRounds = 0;
     while (bothFactionsAlive()) {
       for (Unit unit : units()) {
-        if (!bothFactionsAlive()) {
-          fullRounds--;
-          break;
-        }
         if (unit.hp < 1) continue;
         if (!canFight(unit)) {
-          move(unit);
+          List<Unit> targets = findTargets(unit);
+          if (targets.isEmpty()) {
+            return "" + fullRounds*hitPointsRemaining();
+          }
+          Set<Point> pointsInRange = pointsInRange(targets);
+          printReplacing(pointsInRange, '?', "In range");
+          Set<Point> reachablePoints = pointsInRange.stream()
+                                                    .filter(p -> pathFrom(unit.position, p) != null)
+                                                    .collect(Collectors.toSet());
+          if (reachablePoints.isEmpty()) {
+            continue;
+          }
+          printReplacing(reachablePoints, '@', "Reachable");
+          Set<List<Point>> paths = reachablePoints.stream()
+                                                  .map(p -> pathFrom(unit.position, p))
+                                                  .collect(Collectors.toSet());
+          int minDistance = paths.stream()
+                                 .mapToInt(l -> l.size())
+                                 .min()
+                                 .orElseThrow(IllegalStateException::new);
+          Set<List<Point>> shortestPaths = paths.stream()
+                                                 .filter(p -> p.size() == minDistance)
+                                                 .collect(Collectors.toSet());
+          Set<Point> nearestPoints = shortestPaths.stream()
+                                                  .map(l -> l.get(l.size() -1))
+                                                  .collect(Collectors.toSet());
+          printReplacing(nearestPoints, '!', "Nearest");
+          Point chosenPoint = nearestPoints.stream()
+                                           .sorted(Point.yComparator())
+                                           .findFirst()
+                                           .orElse(null);
+          printReplacing(Set.of(chosenPoint), '+', "Chosen");
+          Set<Point> freeNeighbors = freeAdjacentTo(unit.position);
+          printDistancesTo(chosenPoint, freeNeighbors);
+          Point nextStep = freeNeighbors.stream()
+                                        .filter(p -> {
+                                          List<Point> l = pathFrom(p, chosenPoint);
+                                          return l != null && l.size() == minDistance - 1;
+                                        })
+                                        .sorted(Point.yComparator())
+                                        .findFirst()
+                                        .orElse(null);
+          printReplacing(new TreeSet<Point>(pathFrom(nextStep, chosenPoint)), '*', "Chosen path");
+          grid[unit.position.x][unit.position.y] = '.';
+          unit.position = nextStep;
+          grid[unit.position.x][unit.position.y] = unit.c;
         }
         attackClosest(unit);
       }
       fullRounds++;
+      printGrid();
+      sopl("Round ", fullRounds);
       printAndPause("After ", fullRounds, " full rounds");
     }
+    sopl();
     units().forEach(Advent::sopl);
     return "" + fullRounds*hitPointsRemaining();
+
+  }
+
+  private void printDistancesTo(Point to, Set<Point> froms) {
+    if (!debug) return;
+    Map<Point, Character> chars = new TreeMap<>(Point.yComparator());
+    Map<Character, Integer> dists = new TreeMap<>();
+    char c = 'A';
+    for (Point from : froms) {
+      var path = pathFrom(from, to);
+      if (path == null) continue;
+      grid[from.x][from.y] = c;
+      dists.put(c, path.size());
+      c++;
+    }
+    sopl("Distances");
+    sopl(dists);
+    printAndPause();
+    for (Point point : froms) {
+      grid[point.x][point.y] = '.';
+    }
+  }
+
+  private void printReplacing(Set<Point> points, char c, String message) {
+    if (!debug) return;
+    for (Point point : points) {
+      grid[point.x][point.y] = c;
+    }
+    sopl(message);
+    printAndPause();
+    for (Point point : points) {
+      grid[point.x][point.y] = '.';
+    }
+  }
+
+  private List<Unit> findTargets(Unit unit) {
+    return units().stream()
+                  .filter(u -> u.c != unit.c)
+                  .collect(Collectors.toList());
+  }
+
+  private Set<Point> pointsInRange(List<Unit> targets) {
+    Set<Point> result = new TreeSet<>(Point.yComparator());
+    for (Unit target : targets) {
+      result.addAll(freeAdjacentTo(target.position));
+    }
+    return result;
+  }
+
+  private Set<Point> freeAdjacentTo(Point point) {
+    return adjacent(point).stream()
+                          .filter(p -> charAt(p) == '.')
+                          .collect(Collectors.toSet());
   }
 
   private void printAndPause() {
@@ -134,7 +235,7 @@ public class Advent15 extends Advent {
 
   private void attack(Unit unit, Unit opponent) {
     printAndPause(unit, " attacking ", opponent);
-    opponent.hp -= attackPower;
+    opponent.hp -= unit.power;
     if (opponent.hp < 1) {
       grid[opponent.position.x][opponent.position.y] = '.';
       printAndPause(opponent, " died!");
@@ -161,8 +262,18 @@ public class Advent15 extends Advent {
     return grid[p.x][p.y];
   }
 
-  private void move(Unit unit) {
-    List<Point> path = findShortestPath(unit);
+  private void move(Unit unit, Set<Point> destinations) {
+    Set<List<Point>> shortestPaths = new TreeSet<>();
+    for (Point point : freeAdjacentTo(unit.position)) {
+      List<Point> path = findShortestPath(point, destinations);
+    }
+    List<Point> path = shortestPaths.stream()
+                                    .filter(l -> l != null)
+                                    .sorted(Comparator.comparing((List<Point> l) -> l.size())
+                                                      .thenComparing((List<Point> l) -> l.get(0).y)
+                                                      .thenComparing((List<Point> l) -> l.get(0).x))
+                                    .findFirst()
+                                    .orElse(null);
     if (path != null && !path.isEmpty()) {
       Point currentPosition = unit.position;
       Point nextPosition = path.get(0);
@@ -173,6 +284,30 @@ public class Advent15 extends Advent {
     } else {
       printAndPause(unit, " cannot move");
     }
+  }
+
+  private List<Point> findShortestPath(Point start, Set<Point> targets) {
+    Point closestPoint = null;
+    List<Point> path;
+    List<Point> shortestPath = null;
+    for (Point finish : targets) {
+      if (closestPoint == null) {
+        closestPoint = finish;
+      }
+      path = pathFrom(start, finish);
+      if (path == null) {
+        continue;
+      }
+      if (shortestPath == null || path.size() < shortestPath.size()) {
+        shortestPath = path;
+      } else if (path.size() == shortestPath.size() && path.size() > 0) {
+        if (finish.y < closestPoint.y || finish.y == closestPoint.y && finish.x < closestPoint.x) {
+          closestPoint = finish;
+          shortestPath = path;
+        }
+      }
+    }
+    return shortestPath;
   }
 
   private List<Point> findShortestPath(Unit unit) {
@@ -212,7 +347,99 @@ public class Advent15 extends Advent {
 
   @Override
   protected String part2() {
+    String result;
+    char c = '\0';
+    int power = 16;
+    do {
+      power++;
+      parseElfPower(power);
+      result = playGame();
+      c = result.charAt(0);
+      sopl((c == 'G' ? "Goblins" : "Elves"), " win with elf power ", power);
+    } while(c != 'E');
+    int rounds = Integer.parseInt(result.substring(1));
+    return "" + rounds*hitPointsRemaining();
+  }
+
+  private String playGame() {
+    int rounds = 0;
+    try {
+      while (bothFactionsAlive()) {
+        for (Unit unit : units()) {
+          if (unit.hp < 1) continue;
+          if (!canFight(unit)) {
+            List<Unit> targets = findTargets(unit);
+            if (targets.isEmpty()) {
+              return "" + unit.c + rounds;
+            }
+            Set<Point> pointsInRange = pointsInRange(targets);
+            Set<Point> reachablePoints = pointsInRange.stream()
+                                                      .filter(p -> pathFrom(unit.position, p) != null)
+                                                      .collect(Collectors.toSet());
+            if (reachablePoints.isEmpty()) {
+              continue;
+            }
+            Set<List<Point>> paths = reachablePoints.stream()
+                                                    .map(p -> pathFrom(unit.position, p))
+                                                    .collect(Collectors.toSet());
+            int minDistance = paths.stream()
+                                   .mapToInt(l -> l.size())
+                                   .min()
+                                   .orElseThrow(IllegalStateException::new);
+            Set<List<Point>> shortestPaths = paths.stream()
+                                                   .filter(p -> p.size() == minDistance)
+                                                   .collect(Collectors.toSet());
+            Set<Point> nearestPoints = shortestPaths.stream()
+                                                    .map(l -> l.get(l.size() -1))
+                                                    .collect(Collectors.toSet());
+            Point chosenPoint = nearestPoints.stream()
+                                             .sorted(Point.yComparator())
+                                             .findFirst()
+                                             .orElse(null);
+            Set<Point> freeNeighbors = freeAdjacentTo(unit.position);
+            Point nextStep = freeNeighbors.stream()
+                                          .filter(p -> {
+                                            List<Point> l = pathFrom(p, chosenPoint);
+                                            return l != null && l.size() == minDistance - 1;
+                                          })
+                                          .sorted(Point.yComparator())
+                                          .findFirst()
+                                          .orElse(null);
+            grid[unit.position.x][unit.position.y] = '.';
+            unit.position = nextStep;
+            grid[unit.position.x][unit.position.y] = unit.c;
+          }
+          attackClosestThrowing(unit);
+        }
+        printGrid();
+        sopl("Round ", ++rounds);
+      }
+    } catch (RuntimeException e) {
+      return "G" + rounds;
+    }
     return "";
+  }
+
+  private void attackClosestThrowing(Unit unit) {
+    List<Unit> opponents = adjacentOpponents(unit);
+    if (!opponents.isEmpty()) {
+      opponents.sort(Comparator.comparing((Unit u) -> u.hp));
+                               //.thenComparing((Unit u) -> u.position.y)
+                               //.thenComparing((Unit u) -> u.position.x));
+      attackThrowing(unit, opponents.get(0));
+    }
+  }
+
+  private void attackThrowing(Unit unit, Unit opponent) {
+    printAndPause(unit, " attacking ", opponent);
+    opponent.hp -= unit.power;
+    if (opponent.hp < 1) {
+      if (opponent.c == 'E') {
+        throw new RuntimeException("Elf dead");
+      }
+      grid[opponent.position.x][opponent.position.y] = '.';
+      printAndPause(opponent, " died!");
+    }
   }
 
   static class Unit {
@@ -224,6 +451,7 @@ public class Advent15 extends Advent {
     char c;
     int hp;
     Point position;
+    int power;
 
     @Override
     public String toString() {
@@ -259,7 +487,7 @@ public class Advent15 extends Advent {
 
   List<Point> pathFrom(Point start, Point goal) {
     Set<Point> closedSet = new TreeSet<>(Point.yComparator());
-    Queue<Point> openSet = new ArrayDeque<>();
+    Set<Point> openSet = new TreeSet<>(Point.yComparator());
     openSet.add(start);
 
     Map<Point, Point> cameFrom = new TreeMap<>(Point.yComparator());
