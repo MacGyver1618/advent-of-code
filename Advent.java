@@ -7,6 +7,7 @@ public abstract class Advent {
 
   private int dayNumber;
   protected List<String> input;
+  protected boolean debug = false;
 
   public Advent(int day) {
     this.dayNumber = day;
@@ -18,6 +19,12 @@ public abstract class Advent {
 
   protected static void sopl() {
     System.out.println();
+  }
+
+  protected void debug(Object... args) {
+    if (debug) {
+      sopl(args);
+    }
   }
 
   protected static void sopl(Object... args) {
@@ -144,7 +151,7 @@ public abstract class Advent {
     }
   }
 
-  class Point implements Comparable<Point> {
+  static class Point implements Comparable<Point> {
     int x, y;
 
     Point(int x, int y) {
@@ -168,11 +175,24 @@ public abstract class Advent {
       return "(" + x + "," + y + ")";
     }
 
+    int manhattanDistance(Point other) {
+      return Math.abs(this.x-other.x) + Math.abs(this.y-other.y);
+    }
+
+    Point add(Point other) {
+      return new Point(this.x + other.x, this.y + other.y);
+    }
+
     public int compareTo(Point other) {
       int xDiff = this.x - other.x;
       int yDiff = this.y - other.y;
       int coordDiff = xDiff + yDiff;
       return coordDiff != 0 ? coordDiff : xDiff != 0 ? xDiff : yDiff;
+    }
+
+    static Comparator<Point> yComparator() {
+      return Comparator.comparing((Point p) -> p.y)
+                       .thenComparing((Point p) -> p.x);
     }
   }
 }
