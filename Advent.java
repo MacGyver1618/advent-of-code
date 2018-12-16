@@ -82,19 +82,20 @@ public abstract class Advent {
   }
 
   protected void readInput() {
-    readInput((dayNumber < 10 ? "0" : "") + dayNumber + ".txt");
+    input = readFile((dayNumber < 10 ? "0" : "") + dayNumber + ".txt");
   }
 
   protected void readExample() {
-    readInput((dayNumber < 10 ? "0" : "") + dayNumber + "_example.txt");
+    input = readFile((dayNumber < 10 ? "0" : "") + dayNumber + "_example.txt");
   }
 
-  protected void readInput(String fileName) {
+  protected List<String> readFile(String fileName) {
     try {
       BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      input = reader.lines().collect(Collectors.toList());
+      return reader.lines().collect(Collectors.toList());
     } catch (FileNotFoundException e) {
       sopl("Could not read file ", fileName);
+      return Collections.singletonList("");
     }
   }
 
