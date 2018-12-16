@@ -102,18 +102,15 @@ public class Advent15 extends Advent {
 
   private Point nextStep(Unit unit, List<Unit> targets) {
     List<Point> pointsInRange = pointsInRange(targets);
+    pointsInRange.sort(Comparator.comparing(p -> p.manhattanDistance(unit.position)));
     List<Point> shortestPath = findShortestPath(unit.position, pointsInRange);
     return findBestOrigin(shortestPath);
   }
 
   private List<Point> pointsInRange(List<Unit> targets) {
-    return targets.stream()
-                  .map(u -> u.position)
-                  .map(this::freeAdjacentTo)
-                  .flatMap(Set::stream)
-                  .sorted(Point.yComparator())
-                  .distinct()
-                  .collect(Collectors.toList());
+    Set<Point> set = new TreeSet<>(Point.yComparator());
+    targets.forEach(target -> set.addAll(freeAdjacentTo(target.position)));
+    return new ArrayList<>(set);
   }
 
   private List<Point> findShortestPath(Point origin, List<Point> destinations) {
