@@ -5,12 +5,17 @@ public class Advent22 extends Advent {
 
   private int depth = 3879;
   private Point target = new Point(8, 713);
-  private Point extent = target;
+  private Point extent = target.add(new Point(100,100));
   //private int depth = 510;
   //private Point target = new Point(10, 10);
-  //private Point extent = new Point(16, 16);
+  //private Point extent = new Point(15, 15);
   Point origin = new Point(0,0);
   Map<Point, Region> regions = new TreeMap<>();
+
+
+  Comparator<Position> comparator = Comparator.comparing((Position p) -> p.point)
+                                              .thenComparing((Position p) -> p.tool);
+
 
   public Advent22() {
     super(22);
@@ -44,8 +49,6 @@ public class Advent22 extends Advent {
                        .stream()
                        .filter(e -> e.getKey().x <= target.x)
                        .filter(e -> e.getKey().y <= target.y)
-                       .filter(e -> !e.getKey().equals(origin))
-                       .filter(e -> !e.getKey().equals(target))
                        .mapToInt(e -> e.getValue().riskLevel)
                        .sum();
   }
@@ -74,6 +77,7 @@ public class Advent22 extends Advent {
 
   private int geologicIndex(Point p) {
     if (p.equals(origin)) return 0;
+    if (p.equals(target)) return 0;
     if (p.y == 0) return p.x*16807;
     if (p.x == 0) return p.y*48271;
     return erosionLevel(new Point(p.x-1, p.y))*erosionLevel(new Point(p.x, p.y-1));
@@ -110,60 +114,89 @@ public class Advent22 extends Advent {
   protected String part2() {
     Position start = new Position(origin, Tool.TORCH);
     Position end = new Position(target, Tool.TORCH);
-    return "" + pathFrom(start, end).size();
+    List<Position> path = pathFrom(start, end);
+    return "" + countDistance(path);
+  }
+
+  private int countDistance(List<Position> positions) {
+    Queue<Position> queue = new LinkedList<>(positions);
+    Position current = queue.poll();
+    Position previous = null;
+    int distance = 0;
+    while (!queue.isEmpty()) {
+      //printGrid(current.point);
+      //sopl(current);
+      //pause();
+      previous = current;
+      current = queue.poll();
+      distance += distanceBetween(previous, current);
+    }
+    return distance;
+  }
+
+  private void printGrid(Point player) {
+    StringBuilder sb = new StringBuilder();
+    for (int y = 0; y <= extent.y; y++) {
+      for (int x = 0; x <= extent.x; x++) {
+        Point p = new Point(x, y);
+        Region r = regions.get(p);
+        sopl(p);
+        char c;
+        if (p.equals(player)) {
+          c = 'X';
+        } else if (p.equals(origin)) {
+          c = 'M';
+        } else if (p.equals(target)) {
+          c = 'T';
+        } else {
+          c = r.riskLevel == 0 ? '.' : r.riskLevel == 1 ? '=' : '|';
+        }
+        sb.append(c);
+      }
+      sb.append('\n');
+    }
+    System.out.print(sb.toString());
   }
 
   private Set<Point> adjacent(Point p) {
     Set<Point> result = new TreeSet<>();
     if (p.x > 0) result.add(new Point(p.x-1, p.y));
     if (p.y > 0) result.add(new Point(p.x, p.y-1));
-    result.add(new Point(p.x+1, p.y));
-    result.add(new Point(p.x, p.y+1));
+    if (p.x < extent.x) result.add(new Point(p.x+1, p.y));
+    if (p.y < extent.y) result.add(new Point(p.x, p.y+1));
     return result;
   }
 
   private List<Position> pathFrom(Position start, Position goal) {
-    Set<Position> closedSet = new HashSet<>();
-    Set<Position> openSet = new HashSet<>();
-    openSet.add(start);
+    Map<Position, Position> cameFrom = new TreeMap<>();
+    Map<Position, Integer> distances = new TreeMap<>();
+    Queue<Position> unvisited = new PriorityQueue<>(Comparator.comparing(p -> distances.getOrDefault(p, Integer.MAX_VALUE)));
+    Set<Position> visited = new TreeSet<>();
 
-    Map<Position, Position> cameFrom = new HashMap<>();
-    Map<Position, Integer> gScore = new HashMap<>();
-    gScore.put(start, 0);
+    unvisited.add(start);
+    distances.put(start, 0);
 
-    Map<Position, Integer> fScore = new HashMap<>();
-    fScore.put(start, start.point.manhattanDistance(goal.point));
-
-    while (!openSet.isEmpty()) {
-      Position current = openSet.stream()
-                                .sorted(Comparator.comparing(p -> fScore.getOrDefault(p, Integer.MAX_VALUE)))
-                                .findFirst()
-                                .orElseThrow(IllegalStateException::new);
-
-      if (current.point.equals(goal.point)) {
+    while (!unvisited.isEmpty()) {
+      Position current =  unvisited.poll();
+      if (current.equals(goal)) {
         return reconstructPath(cameFrom, current);
       }
-
-      openSet.remove(current);
-      closedSet.add(current);
+      unvisited.remove(current);
+      visited.add(current);
 
       for (Position neighbor : neighbors(current)) {
-        if (closedSet.contains(neighbor)) {
-          continue;
+        if (!visited.contains(neighbor)) {
+          unvisited.add(neighbor);
         }
-        int tentative_gScore = gScore.getOrDefault(current, Integer.MAX_VALUE-1) + distanceBetween(current, neighbor);
-        if (!openSet.contains(neighbor)) {
-          openSet.add(neighbor);
-        } else if (tentative_gScore >= gScore.getOrDefault(neighbor, Integer.MAX_VALUE-1)) {
-          continue;
+        int currentDistance = distances.getOrDefault(neighbor, Integer.MAX_VALUE);
+        int alternateDistance = distances.get(current) + distanceBetween(current, neighbor);
+        if (alternateDistance < currentDistance) {
+          distances.put(neighbor, alternateDistance);
+          cameFrom.put(neighbor, current);
         }
-
-        cameFrom.put(neighbor, current);
-        gScore.put(neighbor, tentative_gScore);
-        fScore.put(neighbor, gScore.get(neighbor) + neighbor.point.manhattanDistance(goal.point));
       }
     }
-    return null;
+    throw new IllegalStateException("No path found!");
   }
 
   private int distanceBetween(Position a, Position b) {
@@ -224,7 +257,7 @@ public class Advent22 extends Advent {
     return regions.get(p).type;
   }
 
-  class Position {
+  class Position implements Comparable<Position> {
     Point point;
     Tool tool;
     Type type;
@@ -242,6 +275,14 @@ public class Advent22 extends Advent {
     public boolean equals(Object o) {
       Position other = (Position) o;
       return other.point.equals(this.point) && other.tool == this.tool;
+    }
+
+    public String toString() {
+      return "At " + point + " with " + tool.name();
+    }
+
+    public int compareTo(Position other) {
+      return comparator.compare(this, other);
     }
   }
 
