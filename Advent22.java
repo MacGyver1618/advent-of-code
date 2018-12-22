@@ -5,17 +5,10 @@ public class Advent22 extends Advent {
 
   private int depth = 3879;
   private Point target = new Point(8, 713);
-  private Point extent = target.add(new Point(100,100));
-  //private int depth = 510;
-  //private Point target = new Point(10, 10);
-  //private Point extent = new Point(15, 15);
+  private int buffer = 100;
+  private Point extent = target.add(new Point(buffer, buffer));
   Point origin = new Point(0,0);
   Map<Point, Region> regions = new TreeMap<>();
-
-
-  Comparator<Position> comparator = Comparator.comparing((Position p) -> p.point)
-                                              .thenComparing((Position p) -> p.tool);
-
 
   public Advent22() {
     super(22);
@@ -53,28 +46,6 @@ public class Advent22 extends Advent {
                        .sum();
   }
 
-  private void printGrid(int xMax, int yMax) {
-    StringBuilder sb = new StringBuilder();
-    for (int y = 0; y <= yMax; y++) {
-      for (int x = 0; x <= xMax; x++) {
-        Point p = new Point(x, y);
-        Region r = regions.get(p);
-        sopl(p);
-        char c;
-        if (p.equals(origin)) {
-          c = 'M';
-        } else if (p.equals(target)) {
-          c = 'T';
-        } else {
-          c = r.riskLevel == 0 ? '.' : r.riskLevel == 1 ? '=' : '|';
-        }
-        sb.append(c);
-      }
-      sb.append('\n');
-    }
-    System.out.print(sb.toString());
-  }
-
   private int geologicIndex(Point p) {
     if (p.equals(origin)) return 0;
     if (p.equals(target)) return 0;
@@ -93,10 +64,6 @@ public class Advent22 extends Advent {
     return (geoIndex + depth) % 20183;
   }
 
-  private Type regionType(Point p) {
-    return regionType(erosionLevel(p) % 3);
-  }
-
   private Type regionType(int i) {
     switch (i) {
       case 0: return Type.ROCKY;
@@ -112,8 +79,8 @@ public class Advent22 extends Advent {
 
   @Override
   protected String part2() {
-    Position start = new Position(origin, Tool.TORCH);
-    Position end = new Position(target, Tool.TORCH);
+    Position start = new Position(origin, Tool.TORCH, getType(origin));
+    Position end = new Position(target, Tool.TORCH, getType(target));
     List<Position> path = pathFrom(start, end);
     return "" + countDistance(path);
   }
@@ -124,47 +91,11 @@ public class Advent22 extends Advent {
     Position previous = null;
     int distance = 0;
     while (!queue.isEmpty()) {
-      //printGrid(current.point);
-      //sopl(current);
-      //pause();
       previous = current;
       current = queue.poll();
       distance += distanceBetween(previous, current);
     }
     return distance;
-  }
-
-  private void printGrid(Point player) {
-    StringBuilder sb = new StringBuilder();
-    for (int y = 0; y <= extent.y; y++) {
-      for (int x = 0; x <= extent.x; x++) {
-        Point p = new Point(x, y);
-        Region r = regions.get(p);
-        sopl(p);
-        char c;
-        if (p.equals(player)) {
-          c = 'X';
-        } else if (p.equals(origin)) {
-          c = 'M';
-        } else if (p.equals(target)) {
-          c = 'T';
-        } else {
-          c = r.riskLevel == 0 ? '.' : r.riskLevel == 1 ? '=' : '|';
-        }
-        sb.append(c);
-      }
-      sb.append('\n');
-    }
-    System.out.print(sb.toString());
-  }
-
-  private Set<Point> adjacent(Point p) {
-    Set<Point> result = new TreeSet<>();
-    if (p.x > 0) result.add(new Point(p.x-1, p.y));
-    if (p.y > 0) result.add(new Point(p.x, p.y-1));
-    if (p.x < extent.x) result.add(new Point(p.x+1, p.y));
-    if (p.y < extent.y) result.add(new Point(p.x, p.y+1));
-    return result;
   }
 
   private List<Position> pathFrom(Position start, Position goal) {
@@ -208,18 +139,9 @@ public class Advent22 extends Advent {
     result.add(allowedGearChange(pos));
     result.addAll(adjacent(pos.point).stream()
                                      .filter(p -> canAdvance(pos, p))
-                                     .map(p -> new Position(p, pos.tool))
+                                     .map(p -> new Position(p, pos.tool, getType(p)))
                                      .collect(Collectors.toSet()));
     return result;
-  }
-
-  private boolean canAdvance(Position from, Point to) {
-    switch (getType(to)) {
-      case ROCKY: return from.tool != Tool.NEITHER;
-      case WET: return from.tool != Tool.TORCH;
-      case NARROW: return from.tool != Tool.CLIMBING_GEAR;
-    }
-    throw new IllegalStateException();
   }
 
   private Position allowedGearChange(Position pos) {
@@ -236,7 +158,26 @@ public class Advent22 extends Advent {
         newTool = oldTool == Tool.NEITHER ? Tool.TORCH : Tool.NEITHER;
         break;
     }
-    return new Position(pos.point, newTool);
+    return new Position(pos.point, newTool, getType(pos.point));
+  }
+
+  private Set<Point> adjacent(Point p) {
+    Set<Point> result = new TreeSet<>();
+    if (p.x > 0) result.add(new Point(p.x-1, p.y));
+    if (p.y > 0) result.add(new Point(p.x, p.y-1));
+    if (p.x < extent.x) result.add(new Point(p.x+1, p.y));
+    if (p.y < extent.y) result.add(new Point(p.x, p.y+1));
+    return result;
+  }
+
+
+  private boolean canAdvance(Position from, Point to) {
+    switch (getType(to)) {
+      case ROCKY: return from.tool != Tool.NEITHER;
+      case WET: return from.tool != Tool.TORCH;
+      case NARROW: return from.tool != Tool.CLIMBING_GEAR;
+    }
+    throw new IllegalStateException();
   }
 
   private List<Position> reconstructPath(Map<Position, Position> cameFrom, Position current) {
@@ -257,19 +198,22 @@ public class Advent22 extends Advent {
     return regions.get(p).type;
   }
 
-  class Position implements Comparable<Position> {
+  static class Position implements Comparable<Position> {
+
+    static Comparator<Position> comparator = Comparator.comparing((Position p) -> p.point)
+                                                       .thenComparing((Position p) -> p.tool);
     Point point;
     Tool tool;
     Type type;
 
-    Position(Point point, Tool tool) {
+    Position(Point point, Tool tool, Type type) {
       this.point = point;
       this.tool = tool;
-      this.type = getType(point);
+      this.type = type;
     }
 
     public int hashCode() {
-      return point.hashCode();
+      return point.hashCode() + tool.ordinal();
     }
 
     public boolean equals(Object o) {
