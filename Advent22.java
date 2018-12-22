@@ -5,7 +5,7 @@ public class Advent22 extends Advent {
 
   private int depth = 3879;
   private Point target = new Point(8, 713);
-  private int buffer = 100;
+  private int buffer = 50;
   private Point extent = target.add(new Point(buffer, buffer));
   Point origin = new Point(0,0);
   Map<Point, Region> regions = new TreeMap<>();
