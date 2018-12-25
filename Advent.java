@@ -111,7 +111,7 @@ public abstract class Advent {
     return "Not complete";
   }
 
-  private String formatTime(long time) {
+  private static String formatTime(long time) {
     if (time < 1_000) return time + " ns";
     if (time < 1_000_000) return (time / 1_000) + " µs";
     if (time < 1_000_000_000) return (time / 1_000_000) + " ms";
@@ -121,6 +121,7 @@ public abstract class Advent {
   public static void main(String... args) {
     if (args.length == 0)
       args = IntStream.rangeClosed(1,25).mapToObj(String::valueOf).toArray(String[]::new);
+    long startTime = System.nanoTime();
     sopl("*******************");
     sopl("ADVENT OF CODE 2018");
     sopl("*******************");
@@ -128,6 +129,9 @@ public abstract class Advent {
     for (String arg : args) {
       runAdvent(arg);
     }
+    long executionTime = System.nanoTime() - startTime;
+    sopl("Total execution time: ", formatTime(executionTime));
+    sopl();
   }
 
   private static void runAdvent(String number) {

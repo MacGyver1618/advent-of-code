@@ -59,7 +59,7 @@ public class Advent15 extends Advent {
           }
           attackClosest(unit, throwOnElfDeath);
         }
-        sopl("Round ", ++rounds);
+        rounds++;
       }
     } catch (RuntimeException e) {
       return e.getMessage() + rounds;
@@ -219,7 +219,6 @@ public class Advent15 extends Advent {
       parseElfPower(power);
       result = playGame(true);
       c = result.charAt(0);
-      sopl((c == 'G' ? "Goblins" : "Elves"), " win with elf power ", power);
     } while(c != 'E');
     int rounds = Integer.parseInt(result.substring(1));
     return "" + rounds*hitPointsRemaining();
