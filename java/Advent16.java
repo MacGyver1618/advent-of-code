@@ -8,9 +8,7 @@ public class Advent16 extends Advent {
   }
 
   @Override
-  protected void parseInput() {
-
-  }
+  protected void parseInput() {}
 
   @Override
   protected String part1() {

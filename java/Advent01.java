@@ -3,34 +3,43 @@ import java.util.stream.*;
 
 public class Advent01 extends Advent {
 
-  Set<Integer> freqs = new TreeSet<>();
-
   public Advent01() {
     super(1);
   }
 
   @Override
-  protected void parseInput() {}
+  protected void parseInput() {
+  }
 
   @Override
   protected String part1() {
     return "" + input.stream()
-                     .mapToInt(Integer::parseInt)
-                     .sum();
+      .mapToLong(Long::valueOf)
+      .map(i -> i / 3 - 2)
+      .sum();
   }
 
   @Override
   protected String part2() {
-    int freq = 0;
-    int l = input.size();
-    int icrement = 0;
-    freqs.add(freq);
-    for (int i = 0; ; i++) {
-      freq += Integer.parseInt(input.get(i % l));
-      if (freqs.contains(freq))
-        break;
-      freqs.add(freq);
+    return "" + input.stream()
+      .mapToLong(Long::valueOf)
+      .map(this::reduceFuel)
+      .sum();
+  }
+
+  private long reduceFuel(long mass) {
+    long result = 0;
+    long fuel = requiredFuelFor(mass);
+    while (fuel > 0) {
+      result += fuel;
+      fuel = requiredFuelFor(fuel);
     }
-    return freq + "";
+    return result;
+  }
+
+  private long requiredFuelFor(long mass) {
+    if (mass < 0) return 0;
+    long additionalFuel = mass / 3 - 2;
+    return additionalFuel > 0 ? additionalFuel : 0;
   }
 }

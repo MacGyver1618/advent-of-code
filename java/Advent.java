@@ -115,7 +115,7 @@ public abstract class Advent {
     if (args.length == 0)
       args = IntStream.rangeClosed(1,25).mapToObj(String::valueOf).toArray(String[]::new);
     sopl("*******************");
-    sopl("ADVENT OF CODE 2018");
+    sopl("ADVENT OF CODE 2019");
     sopl("*******************");
     sopl();
     for (String arg : args) {
