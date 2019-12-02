@@ -65,11 +65,11 @@ public abstract class Advent {
     long timeTaken = System.nanoTime() - startTime;
     sopl("  Input parsing took ", formatTime(timeTaken));
     startTime = System.nanoTime();
-    String part1 = part1();
+    Object part1 = part1();
     timeTaken = System.nanoTime() - startTime;
     sopl("  Part 1 answer: ", part1, " (", formatTime(timeTaken), ")");
     startTime = System.nanoTime();
-    String part2 = part2();
+    Object part2 = part2();
     timeTaken = System.nanoTime() - startTime;
     sopl("  Part 2 answer: ", part2, " (", formatTime(timeTaken), ")");
     sopl();
@@ -96,11 +96,11 @@ public abstract class Advent {
     sopl("  Input parsing for day ", dayNumber, " not implemented");
   }
 
-  protected String part1() {
+  protected Object part1() {
     return "Not complete";
   }
 
-  protected String part2() {
+  protected Object part2() {
     return "Not complete";
   }
 

@@ -1,0 +1,22 @@
+import java.util.*;
+import java.util.stream.*;
+
+public class Advent%DAY_0% extends Advent {
+
+  public Advent%DAY_0%() {
+    super(%DAY%);
+  }
+
+  @Override
+  protected void parseInput() {}
+
+  @Override
+  protected String part1() {
+    return "";
+  }
+
+  @Override
+  protected String part2() {
+    return "";
+  }
+}

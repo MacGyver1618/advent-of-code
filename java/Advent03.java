@@ -11,12 +11,12 @@ public class Advent03 extends Advent {
   protected void parseInput() {}
 
   @Override
-  protected String part1() {
-    return "";
+  protected Object part1() {
+    return null;
   }
 
   @Override
-  protected String part2() {
-    return "";
+  protected Object part2() {
+    return null;
   }
 }
