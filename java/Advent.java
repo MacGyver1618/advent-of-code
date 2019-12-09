@@ -104,11 +104,11 @@ public abstract class Advent {
     return "Not complete";
   }
 
-  private String formatTime(long time) {
-    if (time < 1_000) return time + " ns";
-    if (time < 1_000_000) return (time / 1_000) + " µs";
-    if (time < 1_000_000_000) return (time / 1_000_000) + " ms";
-    return (time / 1_000_000_000)  + " s";
+  private static String formatTime(long nanos) {
+    if (nanos < 1_000) return nanos + " ns";
+    if (nanos < 1_000_000) return (nanos / 1_000) + " µs";
+    if (nanos < 1_000_000_000) return (nanos / 1_000_000) + " ms";
+    return (nanos / 1_000_000_000)  + " s";
   }
 
   public static void main(String... args) {
@@ -118,9 +118,13 @@ public abstract class Advent {
     sopl("ADVENT OF CODE 2019");
     sopl("*******************");
     sopl();
+    long startTime = System.nanoTime();
     for (String arg : args) {
       runAdvent(arg);
     }
+    long totalTime = System.nanoTime() - startTime;
+    sopl("Total time taken: ", formatTime(totalTime));
+    sopl();
   }
 
   private static void runAdvent(String number) {
@@ -167,6 +171,14 @@ public abstract class Advent {
     @Override
     public String toString() {
       return "(" + x + "," + y + ")";
+    }
+
+    int manhattanDistance(Point other) {
+      return Math.abs(this.x-other.x) + Math.abs(this.y-other.y);
+    }
+
+    Point add(Point other) {
+      return new Point(this.x + other.x, this.y + other.y);
     }
 
     public int compareTo(Point other) {
