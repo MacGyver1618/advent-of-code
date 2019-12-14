@@ -6,7 +6,7 @@ public class IntCodeMachine {
   int pc = 0;
   long[] memory;
   long[] ops = new long[0];
-  long[] modes = new long[0];
+  int[] modes = new int[0];
   long rb = 0;
 
   boolean debug = false;
@@ -54,19 +54,31 @@ public class IntCodeMachine {
 
   private void add() {
     debugRaw(3);
-    readArgs(3);
-    debugInstruction("add", 3);
-    write(2, get(0) + get(1));
+    readModes(3);
+    long op1 = read(modes[0], readNext());
+    long op2 = read(modes[1], readNext());
+    long target = readNext();
+    //debugInstruction("add", 3);
+    write(modes[2], target, op1 + op2);
+    pc++;
   }
 
   private void mult() {
     debugRaw(3);
-    readArgs(3);
-    debugInstruction("mult", 3);
-    write(2, get(0) * get(1));
+    readModes(3);
+    long op1 = read(modes[0], readNext());
+    long op2 = read(modes[1], readNext());
+    long target = readNext();
+    //debugInstruction("mult", 3);
+    write(modes[2], target, op1 * op2);
+    pc++;
   }
 
   private void in() {
+    if (programInputs.isEmpty()) {
+      halted = true;
+      return;
+    }
     debugRaw(1);
     readArgs(1);
     debugInstruction("input", 1);
@@ -86,7 +98,6 @@ public class IntCodeMachine {
       print(get(0));
     } else {
       programOutputs.add(get(0));
-      halted = true;
     }
   }
 
@@ -138,7 +149,7 @@ public class IntCodeMachine {
 
   private void readArgs(int count) {
     ops = new long[count];
-    modes = new long[count];
+    modes = new int[count];
     for (int i = 0; i < count; i++) {
       ops[i] = memory[pc + i + 1];
       modes[i] = mode(i);
@@ -154,6 +165,34 @@ public class IntCodeMachine {
       default: throw new UnsupportedOperationException();
     }
   }
+
+  private long readNext() {
+    return memory[++pc];
+  }
+
+  private void readModes(int count) {
+    modes = new int[count];
+    for (int i = 0; i < count; i++) {
+      modes[i] = mode(i);
+    }
+  }
+
+  private long read(int mode, long raw) {
+    switch (mode) {
+      case 0: return memory[(int)raw];
+      case 1: return raw;
+      case 2: return memory[(int)(raw + rb)];
+      default: throw new UnsupportedOperationException("Unknown read mode " + mode);
+    }
+  }
+
+  private void write(int mode, long addr, long value) {
+    if (mode == 2) {
+      addr += rb;
+    }
+    memory[(int)addr] = value;
+  }
+
   private void write(int pos, long value) {
     long targetAddress = 0;
     switch((int)modes[pos]) {

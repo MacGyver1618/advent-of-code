@@ -69,7 +69,7 @@ public class Advent08 extends Advent {
   protected Object part2() {
     for (int y = 0; y < HEIGHT; y++) {
       for (int x = 0; x < WIDTH; x++) {
-        sop(pixelAt(x,y));
+        sop(pixelAt(x,y), ' ');
       }
       sopl();
     }

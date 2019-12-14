@@ -31,15 +31,12 @@ public class Advent10 extends Advent {
 
   @Override
   protected Object part1() {
-    int maxAsteroids = 0;
-    for (Point p : asteroids) {
-      int asteroids = asteroidsVisibleFrom(p);
-      if (asteroids > maxAsteroids) {
-        station = p;
-        maxAsteroids = asteroids;
-      }
-    }
-    return maxAsteroids;
+    station = asteroids.stream()
+      .sorted(Comparator.comparing(this::asteroidsVisibleFrom)
+                        .reversed())
+      .findFirst()
+      .orElseThrow(NoSuchElementException::new);
+    return asteroidsVisibleFrom(station);
   }
 
   private int asteroidsVisibleFrom(Point o) {
@@ -47,12 +44,10 @@ public class Advent10 extends Advent {
   }
 
   private Set<Point> slopesFrom(Point o) {
-    Set<Point> slopes = new TreeSet<>();
-    for (Point p : asteroids) {
-      if (p.equals(o)) continue;
-      slopes.add(findSlope(o,p));
-    }
-    return slopes;
+    return asteroids.stream()
+      .filter((Point p) -> !o.equals(p))
+      .map((Point p) -> findSlope(o, p))
+      .collect(Collectors.toSet());
   }
 
   private Point findSlope(Point p1, Point p2) {
