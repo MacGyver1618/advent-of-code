@@ -60,7 +60,7 @@ public class Advent13 extends Advent {
       memory[0] = 2;
       grid = new TreeMap<>();
       machine = new IntCodeMachine(memory);
-      runGameVisual();
+      runGameAutomatic();
     } catch (Exception e) {
       sopl(e);
     }

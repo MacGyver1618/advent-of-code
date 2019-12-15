@@ -5,9 +5,9 @@ import java.util.stream.*;
 public class Advent14 extends Advent {
 
   List<Rule> rules;
-  Map<String, Integer> resources;
+  Map<String, Long> resourceRequirements;
+  Map<String, Long> resourceYields;
   Set<String> resourceNames;
-  Map<String, Integer> oreRequirement;
 
   public Advent14() {
     super(14);
@@ -16,8 +16,8 @@ public class Advent14 extends Advent {
   @Override
   protected void parseInput() {
     rules = new ArrayList<>();
-    resources = new TreeMap<>();
-    oreRequirement = new TreeMap<>();
+    resourceRequirements = new TreeMap<>();
+    resourceYields = new TreeMap<>();
     resourceNames = new TreeSet<>();
     for (String line : input) {
       String[] sides = line.split(" => ");
@@ -28,89 +28,158 @@ public class Advent14 extends Advent {
     for (Rule rule : rules) {
       resourceNames.addAll(rule.reagents.keySet());
       resourceNames.add(rule.product);
+      for (Rule upstream : rules) {
+        if (upstream.reagents.containsKey(rule.product)) {
+          rule.inputs.add(upstream);
+        }
+      }
     }
   }
 
   @Override
   protected Object part1() {
-    resources.put("FUEL", 1);
-    while (resources.size() > 1 || !resources.containsKey("ORE")) {
-      sopl(resources);
-      pause();
-      var requiredResources = new TreeSet<>(resources.keySet());
-      for (var resource : requiredResources) {
-        if ("ORE".equals(resource)) {
-          continue;
+    resourceRequirements.put("FUEL", 1L);
+    evaluate(ruleToProduce("FUEL"));
+    while (!rules.stream().allMatch(r -> r.evaluated)) {
+      for (Rule rule : rules) {
+        if (!rule.evaluated) {
+          evaluate(rule);
         }
-        var amount = resources.get(resource);
-        for (var entry : requirementFor(resource, amount).entrySet()) {
-          int currentAmount = resources.getOrDefault(entry.getKey(), 0);
-          resources.put(entry.getKey(), currentAmount + entry.getValue());
-        }
-        resources.remove(resource);
       }
     }
-    return resources.get("ORE");
+    return resourceRequirements.get("ORE");
   }
 
-  private Map<String, Integer> requirementFor(String name, int amount) {
+  private void evaluate(Rule rule) {
+    if (rule.inputs.stream().allMatch(r -> r.evaluated)) {
+      long required = resourceRequirements.get(rule.product);
+      for (var entry : rule.requirement(required).entrySet()) {
+        long currentReq = resourceRequirements.getOrDefault(entry.getKey(), 0L);
+        resourceRequirements.put(entry.getKey(), currentReq + entry.getValue());
+      }
+      rule.evaluated = true;
+    }
+  }
+
+  private boolean onlyOreRequired() {
+    return resourceRequirements.entrySet().stream()
+      .filter((var e) -> e.getValue() > 0)
+      .allMatch((var e) -> e.getKey().equals("ORE"));
+  }
+
+  private void updateRequirement(String name, long amount) {
+    long available = resourceYields.getOrDefault(name, 0L);
+    long currentReq = resourceRequirements.getOrDefault(name, 0L);
+    sopl("We need ", amount, " of ", name, " and have ", available, " available");
+    sopl("Previous requirement is ", currentReq, " of ", name);
+    if (available < amount) {
+      long additionalReq = amount - available;
+      sopl("We need an extra ", additionalReq, " of ", name);
+      resourceRequirements.put(name, additionalReq + currentReq);
+    } else {
+      resourceYields.put(name, available - amount);
+    }
+  }
+
+  private Rule ruleToProduce(String name) {
+    if (name.equals("ORE")) {
+      return new Rule(new String[] { "1 ORE" }, "1 ORE");
+    }
     for (Rule rule : rules) {
       if (rule.product.equals(name)) {
-        return rule.requirement(name, amount);
+        return rule;
       }
     }
     throw new NoSuchElementException(name + " not found in resources");
   }
 
-  static int ceil(int a, int b) {
+  static long ceil(long a, long b) {
     return a % b == 0 ? a/b : a/b + 1;
   }
 
   @Override
   protected Object part2() {
-    return null;
+    long limit = 1_000_000_000_000L;
+    long min = 8_000_000L;
+    long max = 9_000_000L;
+    long mid;
+    while (true) {
+      mid = (min+max)/2;
+      long oreThis = oreForFuel(mid);
+      long oreNext = oreForFuel(mid+1);
+      if (oreThis == limit || (oreThis < limit && oreNext > limit)) {
+          return mid;
+      }
+      if (oreThis < limit) {
+        min = mid;
+      } else if (oreThis > limit) {
+        max = mid;
+      }
+    }
+  }
+
+  private long oreForFuel(long fuel) {
+    parseInput();
+    resourceRequirements.put("FUEL", fuel);
+    evaluate(ruleToProduce("FUEL"));
+    while (!rules.stream().allMatch(r -> r.evaluated)) {
+      for (Rule rule : rules) {
+        if (!rule.evaluated) {
+          evaluate(rule);
+        }
+      }
+    }
+    return resourceRequirements.get("ORE");
   }
 
   static class Rule {
 
-    Map<String, Integer> reagents;
+    Map<String, Long> reagents;
     String product;
-    Integer amount;
+    Long amount;
+    boolean evaluated = false;
+    Set<Rule> inputs = new HashSet<>();
 
     Rule(String[] reagentArray, String productString) {
       reagents = new TreeMap<>();
       for (String reagent : reagentArray) {
         String[] parts = reagent.split(" ");
-        Integer howMuch = Integer.parseInt(parts[0]);
+        Long howMuch = Long.parseLong(parts[0]);
         String name = parts[1];
         reagents.put(name, howMuch);
       }
       String[] productParts = productString.split(" ");
-      amount = Integer.parseInt(productParts[0]);
+      amount = Long.parseLong(productParts[0]);
       product = productParts[1];
     }
 
-    Map<String,Integer> requirement(String name, int amount) {
-      int factor = amount > this.amount ? ceil(amount, this.amount) : 1;
+    long invocationsNeeded(long amount) {
+      return amount > this.amount ? ceil(amount, this.amount) : 1;
+    }
+
+    Map<String,Long> requirement(long amount) {
       var result = new TreeMap<>(reagents);
-      if (factor > 1) {
-        result.replaceAll((k,v) -> v*factor);
-      }
+      result.replaceAll((k,v) -> v*invocationsNeeded(amount));
       return result;
     }
 
-    boolean sufficientResources(Map<String, Integer> resources) {
+    boolean sufficientResources(Map<String, Long> resources) {
       return reagents.entrySet().stream()
-        .allMatch((var e) -> resources.getOrDefault(e.getKey(), 0) >= e.getValue());
+        .allMatch((var e) -> resources.getOrDefault(e.getKey(), 0L) >= e.getValue());
     }
 
-    Map<String, Integer> react(Map<String, Integer> resources) {
+    Map<String, Long> react(Map<String, Long> resources) {
       var result = new TreeMap<>(resources);
       for (var reagent : reagents.entrySet()) {
-        int currentAmount = resources.get(reagent);
+        long currentAmount = resources.get(reagent);
         result.put(reagent.getKey(), currentAmount - reagent.getValue());
       }
       return result;
+    }
+
+    @Override
+    public String toString() {
+      return reagents + " => " + amount + " " + product;
     }
   }
 }
