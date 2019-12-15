@@ -1,7 +1,11 @@
 import java.util.*;
+import java.util.function.*;
 import java.util.stream.*;
 
 public class Advent15 extends Advent {
+
+  boolean visual = true;
+  int frameInterval = 20;
 
   static final int WALL = 0;
   static final int SPACE = 1;
@@ -51,38 +55,72 @@ public class Advent15 extends Advent {
 
   @Override
   protected Object part1() {
-    readGrid();
-    /*
-    findBounds();
-    printGrid();
-    */
-    /*
-    int direction;
-    machine.run();
-    printGrid();
-    while (!machine.finished) {
-      direction = readDirection();
-      machine.input(direction);
-      machine.run();
-      updateGrid(direction);
-      printGrid();
-      sopl(position);
-    }
-    return machine.output();
-    */
+    droid = new Point(0,0);
+    target = droid; //TODO : Remove
+    grid.put(droid, SPACE);
     populateGrid();
-    var path = pathFrom(droid, target);
+    var path = pathFrom(new Point(0,0), target);
     return path.size() - 1;
   }
 
   private void populateGrid() {
-    droid = new Point(0,0);
+    machine.run();
     Point p = droid;
     Queue<Point> queue = new LinkedList<>();
     queue.addAll(fringe(p));
     while (!queue.isEmpty()) {
       p = queue.poll();
-      sopl(p);
+      if (grid.containsKey(p)) {
+        continue;
+      }
+      int tile = explore(p);
+      queue.addAll(fringe(droid));
+      if (visual) {
+        IntStream.rangeClosed(1, 46-xmax+xmin)
+          .forEach(e -> sopl());
+        printGrid();
+        halt(frameInterval);
+      }
+    }
+  }
+
+  private int explore(Point destination) {
+    var path = pathFrom(droid, destination, p -> p.manhattanDistance(destination) == 1);
+    path.add(destination);
+    path.remove(0);
+    int result = -1;
+    for (Point point : path) {
+      int input = nextInput(point);
+      machine.input(input);
+      machine.run();
+      result = (int) machine.output();
+      switch (result) {
+        case WALL: break;
+        case OXYGEN:
+          target = point;
+          result = SPACE;
+          // fallthrough
+        case SPACE:
+          droid = point;
+          break;
+      }
+      grid.put(point, result);
+      if (visual) {
+        printGrid();
+        halt(frameInterval);
+      }
+    }
+    return result;
+  }
+
+  private int nextInput(Point destination) {
+    Point difference = destination.subtract(droid);
+    switch (difference.toString()) {
+      case "(0,-1)": return NORTH;
+      case "(0,1)": return SOUTH;
+      case "(-1,0)": return WEST;
+      case "(1,0)": return EAST;
+      default: throw new UnsupportedOperationException();
     }
   }
 
@@ -91,30 +129,6 @@ public class Advent15 extends Advent {
       .map(d -> directions.get(d).add(p))
       .filter(n -> grid.getOrDefault(n, UNEXPLORED) == UNEXPLORED)
       .collect(Collectors.toList());
-  }
-
-  private void readGrid() {
-    readInput("15.grid");
-    for (int y = 0; y < input.size(); y++) {
-      String line = input.get(y);
-      for (int x = 0; x < line.length(); x++) {
-        char c = line.charAt(x);
-        Point p = new Point(x,y);
-        if (c == 'D') {
-          droid = p;
-          grid.put(p, SPACE);
-        }
-        if (c == 'O') {
-          target = p;
-          grid.put(p, SPACE);
-        }
-        if (c == '#') {
-          grid.put(p, WALL);
-        } else {
-          grid.put(p, SPACE);
-        }
-      }
-    }
   }
 
   private int readDirection() {
@@ -156,8 +170,12 @@ public class Advent15 extends Advent {
     for (int y = ymin; y <= ymax; y++) {
       for (int x = xmin; x <= xmax; x++) {
         Point current = new Point(x,y);
-        if (current.equals(position)) {
-          screenBuffer.append('D');
+        if (current.equals(droid)) {
+          screenBuffer.append("D ");
+          continue;
+        }
+        if (current.equals(target)) {
+          screenBuffer.append("O ");
           continue;
         }
         switch (grid.getOrDefault(current, UNEXPLORED)) {
@@ -166,13 +184,14 @@ public class Advent15 extends Advent {
           case OXYGEN: screenBuffer.append('O'); break;
           case UNEXPLORED: screenBuffer.append('.'); break;
         }
+        screenBuffer.append(' ');
       }
       screenBuffer.append("\n");
     }
     sopl(screenBuffer.toString());
   }
 
-  private List<Point> pathFrom(Point start, Point goal) {
+  private List<Point> pathFrom(Point start, Point goal, Predicate<Point> stopCondition) {
     Set<Point> closedSet = new TreeSet<>();
     Set<Point> openSet = new TreeSet<>();
     openSet.add(start);
@@ -189,7 +208,7 @@ public class Advent15 extends Advent {
                              .sorted(Comparator.comparing(p -> fScore.getOrDefault(p, Integer.MAX_VALUE)))
                              .findFirst()
                              .orElseThrow(IllegalStateException::new);
-      if (current.equals(goal)) {
+      if (stopCondition.test(current)) {
         return reconstructPath(cameFrom, current);
       }
 
@@ -212,13 +231,17 @@ public class Advent15 extends Advent {
         fScore.put(neighbor, gScore.get(neighbor) + neighbor.manhattanDistance(goal));
       }
     }
-    return null;
+    return Collections.emptyList();
+  }
+
+  private List<Point> pathFrom(Point start, Point goal) {
+    return pathFrom(start, goal, p -> p.equals(goal));
   }
 
   private List<Point> neighbors(Point p) {
     return Arrays.asList(NORTH, SOUTH, EAST, WEST).stream()
       .map(d -> directions.get(d).add(p))
-      .filter(n -> grid.get(n) == SPACE)
+      .filter(n -> grid.getOrDefault(n, UNEXPLORED) == SPACE)
       .collect(Collectors.toList());
   }
 
@@ -246,13 +269,11 @@ public class Advent15 extends Advent {
       }
       currentRound = nextRound;
       nextRound = new TreeSet<>();
-      /*
-      sopl();sopl();
-      printGrid();
-      sopl(minutes, " min");
-      try {
-        Thread.sleep(20);
-      } catch (Exception e) {}*/
+      if (visual) {
+        sopl();sopl();
+        printGrid();
+        halt(frameInterval);
+      }
       minutes++;
     }
     return minutes - 1;

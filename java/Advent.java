@@ -26,6 +26,12 @@ public abstract class Advent {
     sopl();
   }
 
+  protected static void halt(int ms) {
+    try {
+      Thread.sleep(ms);
+    } catch (Exception e) {}
+  }
+
   protected static void pause() {
     readString();
   }
@@ -179,6 +185,10 @@ public abstract class Advent {
 
     Point add(Point other) {
       return new Point(this.x + other.x, this.y + other.y);
+    }
+
+    Point subtract(Point other) {
+      return new Point(this.x - other.x, this.y - other.y);
     }
 
     public int compareTo(Point other) {
