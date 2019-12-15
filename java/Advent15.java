@@ -70,8 +70,27 @@ public class Advent15 extends Advent {
     }
     return machine.output();
     */
+    populateGrid();
     var path = pathFrom(droid, target);
     return path.size() - 1;
+  }
+
+  private void populateGrid() {
+    droid = new Point(0,0);
+    Point p = droid;
+    Queue<Point> queue = new LinkedList<>();
+    queue.addAll(fringe(p));
+    while (!queue.isEmpty()) {
+      p = queue.poll();
+      sopl(p);
+    }
+  }
+
+  private List<Point> fringe(Point p) {
+    return Arrays.asList(NORTH, SOUTH, EAST, WEST).stream()
+      .map(d -> directions.get(d).add(p))
+      .filter(n -> grid.getOrDefault(n, UNEXPLORED) == UNEXPLORED)
+      .collect(Collectors.toList());
   }
 
   private void readGrid() {
