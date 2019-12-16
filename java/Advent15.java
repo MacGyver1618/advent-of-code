@@ -5,7 +5,7 @@ import java.util.stream.*;
 public class Advent15 extends Advent {
 
   boolean visual = true;
-  int frameInterval = 20;
+  int frameInterval = 10;
 
   static final int WALL = 0;
   static final int SPACE = 1;
@@ -66,21 +66,20 @@ public class Advent15 extends Advent {
   private void populateGrid() {
     machine.run();
     Point p = droid;
-    Queue<Point> queue = new LinkedList<>();
-    queue.addAll(fringe(p));
-    while (!queue.isEmpty()) {
-      p = queue.poll();
+    //Queue<Point> queue = new LinkedList<>();
+    //queue.addAll(fringe(p));
+    //while (!queue.isEmpty()) {
+      //p = queue.poll();
+    Stack<Point> stack = new Stack<>();
+    stack.addAll(fringe(p));
+    while (!stack.isEmpty()) {
+      p = stack.pop();
       if (grid.containsKey(p)) {
         continue;
       }
       int tile = explore(p);
-      queue.addAll(fringe(droid));
-      if (visual) {
-        IntStream.rangeClosed(1, 46-xmax+xmin)
-          .forEach(e -> sopl());
-        printGrid();
-        halt(frameInterval);
-      }
+      stack.addAll(fringe(droid));
+      //queue.addAll(fringe(droid));
     }
   }
 
@@ -106,6 +105,8 @@ public class Advent15 extends Advent {
       }
       grid.put(point, result);
       if (visual) {
+        IntStream.rangeClosed(1, 46-xmax+xmin)
+          .forEach(e -> sopl());
         printGrid();
         halt(frameInterval);
       }
