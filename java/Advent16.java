@@ -34,9 +34,16 @@ public class Advent16 extends Advent {
 
   private int[] nextPhase(int start) {
     int[] nextPhase = new int[digits.length];
-    int partialSum = 0;
-    for (int i = digits.length - 1; i >= start; i--) {
-      partialSum += digits[i];
+    for (int i = 0; i < digits.length; i++) {
+      int sum = 0;
+      for (int n = i; n < digits.length; n += 4*(i+1)) {
+        for (int offset = 0; offset < i; offset++) {
+          partialSum += digits[n + offset];
+        }
+        for (int offset = 2*(i+1); offset < i; offset++) {
+          partialSum -= digits[n + offset];
+        }
+      }
       nextPhase[i] = partialSum % 10;
     }
     return nextPhase;
