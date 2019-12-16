@@ -25,8 +25,6 @@ public class Advent16 extends Advent {
   protected Object part1() {
     for (int i = 0; i < 100; i++) {
       digits = nextPhase(0);
-      sopl(Arrays.stream(digits).mapToObj(String::valueOf).collect(Collectors.joining()));
-      pause();
     }
     return Arrays.stream(digits)
       .limit(8)
@@ -36,26 +34,18 @@ public class Advent16 extends Advent {
 
   private int[] nextPhase(int start) {
     int[] nextPhase = new int[digits.length];
-    for (int position = start; position < digits.length; position++) {
-      if (position % 10_000 == 0) sop(".");
-      int current = 0;
-      for (int component = start; component < digits.length; component++) {
-        int multiplier = BASE_PATTERN[((component+1)/(position+1))%4];
-        current += digits[component]*multiplier;
-      }
-      nextPhase[position] = Math.abs(current % 10);
+    int partialSum = 0;
+    for (int i = digits.length - 1; i >= start; i--) {
+      partialSum += digits[i];
+      nextPhase[i] = partialSum % 10;
     }
-    sopl();
     return nextPhase;
   }
 
   @Override
   protected Object part2() {
-    parseInput();
     generateLongerInput();
-    sopl(offset, "/", digits.length);
     for (int i = 0; i < 100; i++) {
-      sopl(i);
       digits = nextPhase(offset);
     }
     return Arrays.stream(digits)
@@ -66,6 +56,7 @@ public class Advent16 extends Advent {
   }
 
   private void generateLongerInput() {
+    parseInput();
     int times = 10_000;
     int[] original = Arrays.copyOf(digits, digits.length);
     digits = new int[times*original.length];
