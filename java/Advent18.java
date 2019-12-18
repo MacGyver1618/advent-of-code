@@ -3,7 +3,6 @@ import java.util.function.*;
 import java.util.stream.*;
 
 public class Advent18 extends Advent {
-  //List<Character> allKeys = IntStream.rangeClosed('a','z')
   List<Character> allKeys = new ArrayList<>();
   int complete = 0;
   Map<Point, Character> grid;
@@ -13,6 +12,10 @@ public class Advent18 extends Advent {
   Map<String, Path> segments;
 
   Point startPosition;
+  Point start1;
+  Point start2;
+  Point start3;
+  Point start4;
 
   static final int NORTH = 1;
   static final int SOUTH = 2;
@@ -38,7 +41,6 @@ public class Advent18 extends Advent {
   @Override
   protected void parseInput() {
     populateGrid();
-    //printGrid();
     populatePaths();
   }
 
@@ -79,9 +81,15 @@ public class Advent18 extends Advent {
     segments = new TreeMap<>();
     for (char c : allKeys) {
       Point start = positionOf(c);
-      Path fromCenter = new Path(pathFrom(startPosition, start));
-      paths.put(Set.of(start, startPosition), fromCenter);
-      segments.put(c + "", fromCenter);
+      for (Point pos : Arrays.asList(startPosition, start1, start2, start3, start4)) {
+        if (pos == null) continue;
+        var pathFromStart = pathFrom(pos, start);
+        if (pathFromStart != null) {
+          Path fromCenter = new Path(pathFromStart);
+          paths.put(Set.of(start, pos), fromCenter);
+          segments.put(c + "", fromCenter);
+        }
+      }
       for (char d : allKeys) {
         Point goal = positionOf(d);
         if (start.equals(goal)) {
@@ -91,6 +99,9 @@ public class Advent18 extends Advent {
           continue;
         }
         var path = pathFrom(start, goal);
+        if (path == null) {
+          continue;
+        }
         Path forward = new Path(path);
         Collections.reverse(path);
         Path reverse = new Path(path);
@@ -107,40 +118,7 @@ public class Advent18 extends Advent {
 
   @Override
   protected Object part1() {
-    /*
-    State original = new State(startPosition);
-    Queue<State> queue = new LinkedList<>();
-    Set<State> seen = new HashSet<>();
-    Set<State> goalStates = new HashSet<>();
-    seen.add(original);
-    queue.add(original);
-    int length = 0;
-    while (!queue.isEmpty()) {
-      State current = queue.poll();
-      if (current.order.length() > length) {
-        length = current.order.length();
-        sopl(length);
-      }
-      if (current.isComplete()) {
-        seen.add(current);
-        goalStates.add(current);
-        continue;
-      }
-      for (State candidate : current.nextStates()) {
-        if (!seen.contains(candidate)) {
-          seen.add(candidate);
-          queue.add(candidate);
-        }
-      }
-    }
-    return goalStates.stream()
-      .mapToInt(s -> s.steps)
-      .min()
-      .orElseThrow(IllegalStateException::new);
-      //.map(s -> s.order)
-      //.collect(Collectors.toList());
-      */
-      return shortestRoute();
+    return shortestRoute();
   }
 
   private int shortestRoute() {
@@ -162,10 +140,6 @@ public class Advent18 extends Advent {
 
     while (!queue.isEmpty()) {
       State current = queue.poll();
-      //if (current.isComplete()) {
-      
-      //}
-
       for (State neighbor : current.nextStates()) {
         int distance = distances.get(current) + neighbor.distance(current);
         if (!distances.containsKey(neighbor)) {
@@ -184,22 +158,6 @@ public class Advent18 extends Advent {
       .mapToInt(e -> e.getValue())
       .min()
       .orElseThrow(IllegalStateException::new);
-
-    /*
-
-12      while Q is not empty:
-13          u ← vertex in Q with min dist[u]
-14
-15          remove u from Q
-16
-17          for each neighbor v of u:           // only v that are still in Q
-18              alt ← dist[u] + length(u, v)
-19              if alt < dist[v]:
-20                  dist[v] ← alt
-21                  prev[v] ← u
-22
-23      return dist[], prev[]
-*/
   }
 
   private boolean isTraversible(String s) {
@@ -232,7 +190,11 @@ public class Advent18 extends Advent {
     for (int y = ymin; y <= ymax; y++) {
       for (int x = xmin; x <= xmax; x++) {
         Point p = new Point(x,y);
-        if (p.equals(startPosition)) {
+        if (p.equals(startPosition)
+          || p.equals(start1)
+          || p.equals(start2)
+          || p.equals(start3)
+          || p.equals(start4)) {
           sb.append("@ ");
           continue;
         }
@@ -247,7 +209,66 @@ public class Advent18 extends Advent {
 
   @Override
   protected Object part2() {
-    return null;
+    populatePart2();
+    //printGrid();
+    populatePaths();
+    return shortestTotalRoute();
+  }
+
+  private int shortestTotalRoute() {
+
+    Map<State2, Integer> distances = new HashMap<>();
+    Map<State2, State2> parents = new HashMap<>();
+    State2 start = new State2();
+    start.pos1 = start1;
+    start.pos2 = start2;
+    start.pos3 = start3;
+    start.pos4 = start4;
+
+    Queue<State2> queue = new PriorityQueue<>(
+      Comparator.comparing(
+        (State2 s) -> distances.getOrDefault(s, Integer.MAX_VALUE)));
+
+    distances.put(start, 0);
+    for(State2 state : start.nextStates()) {
+      distances.put(state, state.distance(start));
+      parents.put(state, start);
+      queue.add(state);
+    }
+
+    while (!queue.isEmpty()) {
+      State2 current = queue.poll();
+      for (State2 neighbor : current.nextStates()) {
+        int distance = distances.get(current) + neighbor.distance(current);
+        if (!distances.containsKey(neighbor)) {
+          queue.add(neighbor);
+        }
+        if (distance < distances.getOrDefault(neighbor, Integer.MAX_VALUE)) {
+          distances.put(neighbor, distance);
+          parents.put(neighbor, current);
+        }
+      }
+    }
+
+    return distances.entrySet()
+      .stream()
+      .filter(e -> e.getKey().isComplete())
+      .mapToInt(e -> e.getValue())
+      .min()
+      .orElseThrow(IllegalStateException::new);
+  }
+
+  private void populatePart2() {
+    start1 = startPosition.add(new Point(-1,-1));
+    start2 = startPosition.add(new Point(-1,1));
+    start3 = startPosition.add(new Point(1,-1));
+    start4 = startPosition.add(new Point(1,1));
+    grid.put(startPosition, '#');
+    grid.put(startPosition.add(new Point(-1,0)), '#');
+    grid.put(startPosition.add(new Point(1,0)), '#');
+    grid.put(startPosition.add(new Point(0,-1)), '#');
+    grid.put(startPosition.add(new Point(0,1)), '#');
+    startPosition = new Point(-1,-1);
   }
 
   private List<Point> pathFrom(Point start, Point goal, Predicate<Point> stopCondition) {
@@ -333,7 +354,6 @@ public class Advent18 extends Advent {
       State other = (State) o;
       return this.bitmap == other.bitmap
         && this.position.equals(other.position);
-      //return this.collected.equals(other.collected);
     }
 
     @Override
@@ -367,12 +387,6 @@ public class Advent18 extends Advent {
         .collect(Collectors.toSet());
     }
 
-    Set<Character> reachables() {
-      return remainingVisits().stream()
-        .filter(this::canReach)
-        .collect(Collectors.toSet());
-    }
-
     Set<Character> remainingVisits() {
       return allKeys.stream()
         .filter(c -> (bitmap & (1 << (c - 'a'))) == 0)
@@ -395,12 +409,131 @@ public class Advent18 extends Advent {
       var points = Set.of(position, goal);
       Path path = paths.get(points);
       int anded = path.bitmap & this.bitmap;
-      return path.bitmap == (path.bitmap & this.bitmap);
-      //return collected.containsAll(path.requirements);
+      return path.bitmap == anded;
     }
 
     int distance(State other) {
       return paths.get(Set.of(this.position, other.position)).length;
+    }
+  }
+
+  class State2 {
+    int bitmap;
+    Point pos1;
+    Point pos2;
+    Point pos3;
+    Point pos4;
+
+    @Override
+    public boolean equals(Object o) {
+      State2 other = (State2) o;
+      return this.bitmap == other.bitmap
+        && this.pos1.equals(other.pos1)
+        && this.pos2.equals(other.pos2)
+        && this.pos3.equals(other.pos3)
+        && this.pos4.equals(other.pos4);
+    }
+
+    @Override
+    public int hashCode() {
+      return bitmap*31
+        + pos1.hashCode()*23
+        + pos2.hashCode()*97
+        + pos3.hashCode()*59
+        + pos4.hashCode()*37;
+    }
+
+    @Override
+    public String toString() {
+      return pos1 + " " + pos2 + " " + pos3 + " " + pos4 + " " + found();
+    }
+
+    String found() {
+      String result = "";
+      for (int i = 0; i < 26; i++) {
+        if (((bitmap >> i) & 1) == 1) {
+          result += (char)('a'+i);
+        }
+      }
+      return result;
+    }
+
+    boolean isComplete() {
+      return complete == bitmap;
+    }
+
+    int distance(State2 other) {
+      if (!this.pos1.equals(other.pos1)) {
+        return paths.get(Set.of(this.pos1, other.pos1)).length;
+      }
+      if (!this.pos2.equals(other.pos2)) {
+        return paths.get(Set.of(this.pos2, other.pos2)).length;
+      }
+      if (!this.pos3.equals(other.pos3)) {
+        return paths.get(Set.of(this.pos3, other.pos3)).length;
+      }
+      if (!this.pos4.equals(other.pos4)) {
+        return paths.get(Set.of(this.pos4, other.pos4)).length;
+      }
+      return 0;
+    }
+
+    private boolean canReach(char target) {
+      Point goal = positionOf(target);
+      if (goal.equals(pos1)
+        || goal.equals(pos2)
+        || goal.equals(pos3)
+        || goal.equals(pos4)) {
+          return false;
+      }
+      for (Point position : Arrays.asList(pos1, pos2, pos3, pos4)) {
+        var points = Set.of(position, goal);
+        Path path = paths.get(points);
+        if (path == null) {
+          continue;
+        }
+        int anded = path.bitmap & this.bitmap;
+        if (path.bitmap == anded) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    Set<State2> nextStates() {
+      return remainingVisits().stream()
+        .filter(this::canReach)
+        .map(this::newState)
+        .collect(Collectors.toSet());
+    }
+
+    Set<Character> remainingVisits() {
+      return allKeys.stream()
+        .filter(c -> (bitmap & (1 << (c - 'a'))) == 0)
+        .collect(Collectors.toSet());
+    }
+
+    State2 newState(char nextTarget) {
+      State2 next = new State2();
+      next.pos1 = this.pos1;
+      next.pos2 = this.pos2;
+      next.pos3 = this.pos3;
+      next.pos4 = this.pos4;
+      Point nextPosition = positionOf(nextTarget);
+      if (paths.containsKey(Set.of(pos1, nextPosition))) {
+        next.pos1 = nextPosition;
+      }
+      if (paths.containsKey(Set.of(pos2, nextPosition))) {
+        next.pos2 = nextPosition;
+      }
+      if (paths.containsKey(Set.of(pos3, nextPosition))) {
+        next.pos3 = nextPosition;
+      }
+      if (paths.containsKey(Set.of(pos4, nextPosition))) {
+        next.pos4 = nextPosition;
+      }
+      next.bitmap = this.bitmap + (1 << (nextTarget - 'a'));
+      return next;
     }
   }
 
