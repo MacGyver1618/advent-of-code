@@ -33,18 +33,23 @@ public class Advent16 extends Advent {
   }
 
   private int[] nextPhase(int start) {
-    int[] nextPhase = new int[digits.length];
-    for (int i = 0; i < digits.length; i++) {
+    int l = digits.length;
+    int[] nextPhase = new int[l];
+    for (int i = 0; i < l; i++) {
       int sum = 0;
-      for (int n = i; n < digits.length; n += 4*(i+1)) {
-        for (int offset = 0; offset < i; offset++) {
-          partialSum += digits[n + offset];
-        }
-        for (int offset = 2*(i+1); offset < i; offset++) {
-          partialSum -= digits[n + offset];
+      int k = i + 1;
+      int substep = 2*k;
+      int groupstep = 4*k;
+      for (int n = i; n < l; n += groupstep) {
+        for (int offset = 0; offset < k && n + offset < l; offset++) {
+          int index = n + offset;
+          sum += digits[index];
+          if (index + substep < l)
+            sum -= digits[index + substep];
         }
       }
-      nextPhase[i] = partialSum % 10;
+      if (sum < 0) sum *= -1;
+      nextPhase[i] = sum % 10;
     }
     return nextPhase;
   }
@@ -53,7 +58,13 @@ public class Advent16 extends Advent {
   protected Object part2() {
     generateLongerInput();
     for (int i = 0; i < 100; i++) {
-      digits = nextPhase(offset);
+      int[] nextPhase = new int[digits.length];
+      int partialSum = 0;
+      for (int k = digits.length - 1; k >= offset; k--) {
+        partialSum += digits[k];
+        nextPhase[k] = partialSum % 10;
+      }
+      digits = nextPhase;
     }
     return Arrays.stream(digits)
       .skip(offset)
