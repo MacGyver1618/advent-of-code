@@ -3,20 +3,106 @@ import java.util.stream.*;
 
 public class Advent21 extends Advent {
 
+  boolean visual = false;
+  int frameInterval = 50;
+
+  static final int NORTH = 1;
+  static final int SOUTH = 2;
+  static final int WEST = 3;
+  static final int EAST = 4;
+
+  List<Point> limits = Arrays.asList(new Point(0,-99), new Point(99,0), new Point(99,-99));
+
+  Map<Integer, Point> directions = new HashMap<>() {{
+    put(NORTH, new Point(0,-1));
+    put(SOUTH, new Point(0,1));
+    put(WEST, new Point(-1,0));
+    put(EAST, new Point(1,0));
+  }};
+
+  StringBuffer screenBuffer;
+  long[] memory;
+  IntCodeMachine machine;
+  Map<Point, Character> grid;
+
+
+  Point position;
+  Point droid;
+  Point target;
+
+  int xmin = Integer.MAX_VALUE;
+  int xmax = Integer.MIN_VALUE;
+  int ymin = Integer.MAX_VALUE;
+  int ymax = Integer.MIN_VALUE;
+
   public Advent21() {
     super(21);
   }
 
   @Override
-  protected void parseInput() {}
+  protected void parseInput() {
+    memory = Arrays.stream(input.get(0).split(","))
+      .mapToLong(Long::valueOf)
+      .toArray();
+    machine = new IntCodeMachine(memory);
+    grid = new TreeMap<>();
+    machine = new IntCodeMachine(memory);
+  }
 
-  @Override
-  protected String part1() {
-    return "";
+  private void printGrid() {
+    for (int y = ymin; y <= ymax; y++) {
+      for (int x = xmin; x <= xmax; x++) {
+        char c = grid.getOrDefault(new Point(x,y), '.');
+        sop(c);
+      }
+      sopl();
+    }
   }
 
   @Override
-  protected String part2() {
-    return "";
+  protected Object part1() {
+    putInstruction("NOT C T");
+    putInstruction("AND D T");
+    putInstruction("OR T J");
+    putInstruction("NOT B T");
+    putInstruction("AND D T");
+    putInstruction("OR T J");
+    putInstruction("NOT A T");
+    putInstruction("AND D T");
+    putInstruction("OR T J");
+    putInstruction("WALK");
+
+    machine.run();
+    //printOutput();
+    return machine.output();
+  }
+
+  private void putInstruction(String instruction) {
+    instruction.chars()
+      .forEach(c -> machine.input((long) c));
+    machine.input((long)'\n');
+  }
+
+  void printOutput() {
+    machine.programOutputs.forEach(l -> sop((char)l.longValue()));
+  }
+
+  @Override
+  protected Object part2() {
+    machine = new IntCodeMachine(memory);
+    putInstruction("NOT C T");
+    putInstruction("AND D T");
+    putInstruction("OR T J");
+    putInstruction("NOT B T");
+    putInstruction("AND D T");
+    putInstruction("OR T J");
+    putInstruction("NOT A T");
+    putInstruction("AND D T");
+    putInstruction("OR T J");
+    putInstruction("RUN");
+
+    machine.run();
+    printOutput();
+    return machine.output();
   }
 }

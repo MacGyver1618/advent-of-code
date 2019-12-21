@@ -198,4 +198,42 @@ public abstract class Advent {
       return coordDiff != 0 ? coordDiff : xDiff != 0 ? xDiff : yDiff;
     }
   }
+
+  static class Point3 implements Comparable<Point3> {
+    int x, y, z;
+
+    Point3(int x, int y, int z) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      Point3 that = (Point3) other;
+      return this.x == that.x && this.y == that.y && this.z == that.z;
+    }
+
+    @Override
+    public int hashCode() {
+      return 1_000_000*x + 1_000*y + z;
+    }
+
+    @Override
+    public String toString() {
+      return "(" + x + "," + y + "," + z + ")";
+    }
+
+    int manhattanDistance(Point3 other) {
+      return Math.abs(this.x-other.x) + Math.abs(this.y-other.y) + Math.abs(this.z-other.z);
+    }
+
+    public int compareTo(Point3 other) {
+      int xDiff = this.x - other.x;
+      int yDiff = this.y - other.y;
+      int zDiff = this.z - other.z;
+      int coordDiff = xDiff + yDiff + zDiff;
+      return coordDiff != 0 ? coordDiff : xDiff != 0 ? xDiff : yDiff != 0 ? yDiff : zDiff;
+    }
+  }
 }
