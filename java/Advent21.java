@@ -61,19 +61,12 @@ public class Advent21 extends Advent {
 
   @Override
   protected Object part1() {
+    putInstruction("NOT A J");
     putInstruction("NOT C T");
-    putInstruction("AND D T");
     putInstruction("OR T J");
-    putInstruction("NOT B T");
-    putInstruction("AND D T");
-    putInstruction("OR T J");
-    putInstruction("NOT A T");
-    putInstruction("AND D T");
-    putInstruction("OR T J");
+    putInstruction("AND D J");
     putInstruction("WALK");
-
     machine.run();
-    //printOutput();
     return machine.output();
   }
 
@@ -90,19 +83,16 @@ public class Advent21 extends Advent {
   @Override
   protected Object part2() {
     machine = new IntCodeMachine(memory);
-    putInstruction("NOT C T");
-    putInstruction("AND D T");
-    putInstruction("OR T J");
+    putInstruction("NOT A J");
     putInstruction("NOT B T");
-    putInstruction("AND D T");
     putInstruction("OR T J");
-    putInstruction("NOT A T");
-    putInstruction("AND D T");
+    putInstruction("NOT C T");
     putInstruction("OR T J");
+    putInstruction("AND H J");
+    putInstruction("OR E J");
+    putInstruction("AND D J");
     putInstruction("RUN");
-
     machine.run();
-    printOutput();
     return machine.output();
   }
 }
