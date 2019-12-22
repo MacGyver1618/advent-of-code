@@ -78,7 +78,6 @@ public class Advent22 extends Advent {
   @Override
   protected Object part2() {
     BigInteger size = BigInteger.valueOf(119_315_717_514_047L);
-    //BigInteger size = BigInteger.valueOf(DECK_SIZE);
     BigInteger shuffles = BigInteger.valueOf(101_741_582_076_661L);
     BigInteger skip = BigInteger.ONE;
     BigInteger start = BigInteger.ZERO;
@@ -86,9 +85,6 @@ public class Advent22 extends Advent {
     Collections.reverse(reverse);
     for (String line : reverse) {
       String[] ss = line.split(" ");
-      //sopl("skip = ", skip, ", start = ", start);
-      //sopl(line);
-      //pause();
       if (ss[1].equals("into")) {
         skip = skip.negate().mod(size);
         start = start.negate().add(size).subtract(BigInteger.ONE).mod(size);
@@ -106,11 +102,9 @@ public class Advent22 extends Advent {
         continue;
       }
     }
-    //skip = skip.mod(size);//.pow(shuffles).mod(size);
-    //start = start.mod(size);//.multiply(());
-    //printArr(skip, start);
+    start = start.multiply((skip.modPow(shuffles, size).subtract(BigInteger.ONE)).multiply(skip.subtract(BigInteger.ONE).modInverse(size)));
+    skip = skip.modPow(shuffles, size);
     return BigInteger.valueOf(2020).multiply(skip).add(start).mod(size);
-    //return cards.get(2020);
   }
 
   void printArr(BigInteger skip, BigInteger start) {
