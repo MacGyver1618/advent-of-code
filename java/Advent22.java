@@ -77,12 +77,14 @@ public class Advent22 extends Advent {
 
   @Override
   protected Object part2() {
-    //BigInteger size = BigInteger.valueOf(119_315_717_514_047L);
-    BigInteger size = BigInteger.valueOf(DECK_SIZE);
+    BigInteger size = BigInteger.valueOf(119_315_717_514_047L);
+    //BigInteger size = BigInteger.valueOf(DECK_SIZE);
     BigInteger shuffles = BigInteger.valueOf(101_741_582_076_661L);
     BigInteger skip = BigInteger.ONE;
     BigInteger start = BigInteger.ZERO;
-    for (String line : input) {
+    var reverse = new ArrayList<>(input);
+    Collections.reverse(reverse);
+    for (String line : reverse) {
       String[] ss = line.split(" ");
       //sopl("skip = ", skip, ", start = ", start);
       //sopl(line);
@@ -94,20 +96,20 @@ public class Advent22 extends Advent {
       }
       if (ss[1].equals("with")) {
         BigInteger inc = new BigInteger(ss[3]);
-        skip = skip.multiply(inc).mod(size);
-        start = start.multiply(inc).mod(size);
+        skip = skip.multiply(inc.modInverse(size)).mod(size);
+        start = start.multiply(inc.modInverse(size)).mod(size);
         continue;
       }
       if (ss[0].equals("cut")) {
         BigInteger amt = new BigInteger(ss[1]);
-        start = start.subtract(amt).mod(size);
+        start = start.add(amt).mod(size);
         continue;
       }
     }
     //skip = skip.mod(size);//.pow(shuffles).mod(size);
     //start = start.mod(size);//.multiply(());
     //printArr(skip, start);
-    return BigInteger.valueOf(2019).multiply(skip).add(start).mod(BigInteger.valueOf(10007));
+    return BigInteger.valueOf(2020).multiply(skip).add(start).mod(size);
     //return cards.get(2020);
   }
 
