@@ -110,7 +110,6 @@ public class Advent12 extends Advent {
       new long[] {ymin, ymax},
       new long[] {zmin, zmax},
     };
-    /*
     long scaleFactor = 1;
     int fps = 20;
     long cycle = 0;
@@ -126,8 +125,7 @@ public class Advent12 extends Advent {
       cycle++;
     }
     return lcm(lcm(xperiod, yperiod), zperiod);
-    */
-    return lcm(yperiod, zperiod);
+    //return lcm(yperiod, zperiod);
   }
 
   private void drawPlanets(int xdim, int ydim) {

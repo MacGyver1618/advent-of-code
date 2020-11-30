@@ -3,7 +3,7 @@ import java.util.stream.*;
 
 public class Advent19 extends Advent {
 
-  boolean visual = false;
+  boolean visual = true;
   int frameInterval = 50;
 
   static final int NORTH = 1;

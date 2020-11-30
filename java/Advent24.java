@@ -3,7 +3,7 @@ import java.util.stream.*;
 
 public class Advent24 extends Advent {
 
-  boolean visual = false;
+  boolean visual = true;
   int frameInterval = 50;
   //char[][] grid;
   Map<Point, Character> grid;

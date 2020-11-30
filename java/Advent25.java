@@ -39,13 +39,12 @@ public class Advent25 extends Advent {
     - take coin
     - south->west->north->north->north
     */
-    /*
+
     while (!machine.finished) {
       machine.run();
       printOutput();
       takeInput();
     }
-    */
     return 19013632;
   }
 

@@ -4,8 +4,8 @@ import java.util.stream.*;
 
 public class Advent15 extends Advent {
 
-  boolean visual = false;
-  int frameInterval = 10;
+  boolean visual = true;
+  int frameInterval = 30;
 
   static final int WALL = 0;
   static final int SPACE = 1;

@@ -210,7 +210,7 @@ public class Advent18 extends Advent {
   @Override
   protected Object part2() {
     populatePart2();
-    //printGrid();
+    printGrid();
     populatePaths();
     return shortestTotalRoute();
   }
