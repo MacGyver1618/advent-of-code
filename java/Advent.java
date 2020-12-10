@@ -1,5 +1,7 @@
 import java.io.*;
 import java.lang.reflect.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.*;
 
@@ -8,6 +10,7 @@ public abstract class Advent {
   private static final String INPUT_PATH = "../input/";
   private int dayNumber;
   protected List<String> input;
+  protected String fullInput;
 
   public Advent(int day) {
     this.dayNumber = day;
@@ -24,6 +27,18 @@ public abstract class Advent {
   protected static void sopl(Object... args) {
     sop(args);
     sopl();
+  }
+
+  protected static int toInt(String s) {
+    return Integer.parseInt(s);
+  }
+
+  protected static long toLong(String s) {
+    return Long.parseLong(s);
+  }
+
+  protected static double toDouble(String s) {
+    return Double.parseDouble(s);
   }
 
   protected static void halt(int ms) {
@@ -73,11 +88,19 @@ public abstract class Advent {
     startTime = System.nanoTime();
     Object part1 = part1();
     timeTaken = System.nanoTime() - startTime;
-    sopl("  Part 1 answer: ", part1, " (", formatTime(timeTaken), ")");
+    if (part1 == null) {
+      sopl("  Part 1 not implemented");
+    } else {
+      sopl("  Part 1 answer: ", part1, " (", formatTime(timeTaken), ")");
+    }
     startTime = System.nanoTime();
     Object part2 = part2();
     timeTaken = System.nanoTime() - startTime;
-    sopl("  Part 2 answer: ", part2, " (", formatTime(timeTaken), ")");
+    if (part2 == null) {
+      sopl("  Part 2 not implemented");
+    } else {
+      sopl("  Part 2 answer: ", part2, " (", formatTime(timeTaken), ")");
+    }
     sopl();
   }
 
@@ -90,25 +113,19 @@ public abstract class Advent {
   }
 
   protected void readInput(String fileName) {
-    try {
-      BufferedReader reader = new BufferedReader(new FileReader(INPUT_PATH + fileName));
+    try (BufferedReader reader = new BufferedReader(new FileReader(INPUT_PATH + fileName))) {
       input = reader.lines().collect(Collectors.toList());
-    } catch (FileNotFoundException e) {
+      fullInput = Files.readString(Path.of(INPUT_PATH + fileName));
+    } catch (IOException e) {
       sopl("Could not read file ", fileName);
     }
   }
 
-  protected void parseInput() {
-    sopl("  Input parsing for day ", dayNumber, " not implemented");
-  }
+  protected abstract void parseInput();
 
-  protected Object part1() {
-    return "Not complete";
-  }
+  protected abstract Object part1();
 
-  protected Object part2() {
-    return "Not complete";
-  }
+  protected abstract Object part2();
 
   private static String formatTime(long nanos) {
     if (nanos < 1_000) return nanos + " ns";
@@ -121,7 +138,7 @@ public abstract class Advent {
     if (args.length == 0)
       args = IntStream.rangeClosed(1,25).mapToObj(String::valueOf).toArray(String[]::new);
     sopl("*******************");
-    sopl("ADVENT OF CODE 2019");
+    sopl("ADVENT OF CODE 2020");
     sopl("*******************");
     sopl();
     long startTime = System.nanoTime();

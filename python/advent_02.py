@@ -1,23 +1,19 @@
 from advent_lib import *
 import itertools as iter
+import re
 
-input = to_nums(lines(2)[0].split(","))
+lines = lines(2)
 
-def eval(a, b):
-    nums = input.copy()
-    nums[1:3] = (a, b)
-    pos = 0
-    (op, a, b, c) = nums[pos:pos+4]
-    while op != 99:
-        if   op == 1: nums[c] = nums[a] + nums[b]
-        elif op == 2: nums[c] = nums[a] * nums[b]
-        pos += 4
-        (op, a, b, c) = nums[pos:pos+4]
-    return nums[0]
+def matches(s):
+    min, max, char, pw = re.match(r"(\d+)-(\d+) (.): (.+)", s).groups()
+    count = len(list(re.finditer(re.compile(char), pw)))
+    return count >= int(min) and count <= int(max)
 
-print("Part 1: ", eval(12, 2))
 
-for noun, verb in iter.product(range(100), range(100)):
-    if eval(noun, verb) == 19690720:
-        print("Part 2: ", noun*100 + verb)
-        break
+print("Part 1: ", len(list(filter(matches, lines))))
+
+def matches2(s):
+    min, max, char, pw = re.match(r"(\d+)-(\d+) (.): (.+)", s).groups()
+    return (pw[int(min)-1] == char) ^ (pw[int(max)-1] == char)
+
+print("Part 2: ", len(list(filter(matches2, lines))))

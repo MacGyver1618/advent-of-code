@@ -1,12 +1,13 @@
-import java.util.*;
-import java.util.regex.*;
-import java.util.stream.*;
+import com.google.common.collect.Sets;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Advent06 extends Advent {
-
-  private Pattern p = Pattern.compile("([A-Z0-9]+)\\)([A-Z0-9]+)");
-
-  private Map<String, String> orbits;
+  List<List<Set<String>>> groups = new ArrayList<>();
 
   public Advent06() {
     super(6);
@@ -14,58 +15,39 @@ public class Advent06 extends Advent {
 
   @Override
   protected void parseInput() {
-    orbits = new HashMap<>();
-    for (String line : input) {
-      Matcher m = p.matcher(line);
-      m.find();
-      String center = m.group(1);
-      String orbiter = m.group(2);
-      orbits.put(orbiter, center);
+    for (String group : fullInput.split("\n\n")) {
+      groups.add(Arrays.stream(group.split("\n"))
+        .map(s -> s.split(""))
+        .map(Set::of)
+        .collect(Collectors.toList()));
     }
   }
 
   @Override
   protected Object part1() {
-    return orbits.keySet().stream()
-      .mapToInt(this::countOrbits)
+    return groups.stream()
+      .mapToInt(this::union)
       .sum();
-  }
-
-  private int countOrbits(String orbiter) {
-    if (orbiter.equals("COM")) return 0;
-    int orbitCount = 0;
-    String orbited = orbits.get(orbiter);
-    while (orbited != null) {
-      orbitCount++;
-      orbited = orbits.get(orbited);
-    }
-    return orbitCount;
   }
 
   @Override
   protected Object part2() {
-    var fromYou = orbitPathFrom("YOU");
-    var fromSanta = orbitPathFrom("SAN");
-    return findDiff(fromYou, fromSanta);
+    return groups.stream()
+      .mapToInt(this::intersection)
+      .sum();
   }
 
-  private List<String> orbitPathFrom(String orbiter) {
-    List<String> result = new ArrayList<>();
-    String orbited = orbits.get(orbiter);
-    while (orbited != null) {
-      result.add(orbited);
-      orbited = orbits.get(orbited);
-    }
-    return result;
+  private int union(List<Set<String>> sets) {
+    return sets.stream()
+      .reduce(Sets::union)
+      .get()
+      .size();
   }
 
-  private int findDiff(List<String> a, List<String> b) {
-    for (int i = 1; ; i++) {
-      String fromA = a.get(a.size() - i);
-      String fromB = b.get(b.size() - i);
-      if (!fromA.equals(fromB)) {
-        return a.size() + b.size() - 2*i + 2;
-      }
-    }
+  private int intersection(List<Set<String>> sets) {
+    return sets.stream()
+      .reduce(Sets::intersection)
+      .get()
+      .size();
   }
 }

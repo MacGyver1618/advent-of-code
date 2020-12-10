@@ -1,15 +1,15 @@
 (def input (slurp "input/01.txt"))
 
-(def masses (map #(Integer/valueOf %) (clojure.string/split input #"\n")))
-
-(defn fuel-for [mass]
-  (- (quot mass 3) 2))
+(def nums (map #(Integer/valueOf %) (clojure.string/split input #"\n")))
 
 (println "Part 1"
-  (reduce + (map fuel-for masses)))
-
-(defn total-fuel-for [mass]
-  (reduce + (rest (take-while pos? (iterate fuel-for mass)))))
+  (->> (for [x nums y nums] (seq [x y]))
+       (filter #(== 2020 (reduce + %)))
+       (map (partial apply *))
+       (first)))
 
 (println "Part 2"
-  (reduce + (map total-fuel-for masses)))
+  (->> (for [x nums y nums z nums] (seq [x y z]))
+       (filter #(== 2020 (reduce + %)))
+       (map (partial apply *))
+       (first)))

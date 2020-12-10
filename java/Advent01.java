@@ -1,45 +1,52 @@
 import java.util.*;
 import java.util.stream.*;
 
+import static java.util.stream.Collectors.toList;
+
 public class Advent01 extends Advent {
 
   public Advent01() {
     super(1);
   }
 
+  List<Integer> nums;
+
   @Override
   protected void parseInput() {
+    nums = input.stream()
+      .map(Integer::valueOf)
+      .collect(toList());
   }
 
   @Override
-  protected String part1() {
-    return "" + input.stream()
-      .mapToLong(Long::valueOf)
-      .map(i -> i / 3 - 2)
-      .sum();
-  }
-
-  @Override
-  protected String part2() {
-    return "" + input.stream()
-      .mapToLong(Long::valueOf)
-      .map(this::reduceFuel)
-      .sum();
-  }
-
-  private long reduceFuel(long mass) {
-    long result = 0;
-    long fuel = requiredFuelFor(mass);
-    while (fuel > 0) {
-      result += fuel;
-      fuel = requiredFuelFor(fuel);
+  protected Object part1() {
+    for (int i : nums) {
+      for (int j : nums) {
+        if (i + j == 2020) {
+          if (i == j) {
+            continue;
+          }
+          return i * j;
+        }
+      }
     }
-    return result;
+    return null;
   }
 
-  private long requiredFuelFor(long mass) {
-    if (mass < 0) return 0;
-    long additionalFuel = mass / 3 - 2;
-    return additionalFuel > 0 ? additionalFuel : 0;
+  @Override
+  protected Object part2() {
+    for (int i : nums) {
+      for (int j : nums) {
+        for (int k : nums) {
+          if (i + j + k == 2020) {
+            if (i == j || i == k || j == k) {
+              continue;
+            }
+            return i * j * k;
+          }
+        }
+      }
+    }
+    return null;
   }
 }

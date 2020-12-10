@@ -1,76 +1,75 @@
 import java.util.*;
 import java.util.stream.*;
 
+import static java.util.stream.Collectors.toList;
+
 public class Advent04 extends Advent {
 
-  int min = 387638;
-  int max = 919123;
+  List<Map<String,String>> passports = new ArrayList<>();
 
   public Advent04() {
     super(4);
   }
 
   @Override
-  protected void readInput() {}
-
-  @Override
-  protected void parseInput() {}
+  protected void parseInput() {
+    var current = new HashMap<String, String>();
+    for (String line : input) {
+      if (line.length() == 0) {
+        passports.add(current);
+        current = new HashMap<>();
+        continue;
+      }
+      var pairs = line.split(" ");
+      for (var pair : pairs) {
+        var kvp = pair.split(":");
+        current.put(kvp[0], kvp[1]);
+      }
+    }
+    passports.add(current);
+  }
 
   @Override
   protected Object part1() {
-    return IntStream.rangeClosed(min, max)
-      .filter(this::isMonotonic)
-      .filter(this::hasDouble)
-      .count();
+    return passports.stream().filter(this::isValid).count();
   }
 
-  private boolean isMonotonic(int n) {
-      int cur;
-      int prev = n % 10;
-      n /= 10;
-      for (; n > 0; n /= 10, prev = cur) {
-        if (prev < (cur = n % 10)) {
-          return false;
-        }
-      }
-      return true;
+  private boolean isValid(Map<String, String> passport) {
+    return passport.keySet().containsAll(Set.of("byr", "iyr", "eyr", "hgt","hcl","ecl", "pid"));
   }
 
-  private boolean hasDouble(int n) {
-    int cur;
-    int prev = n % 10;
-    n /= 10;
-    for (; n > 0; n /= 10, prev = cur) {
-      if (prev == (cur = n % 10)) {
-        return true;
-      }
+  private boolean isValid2(Map<String, String> p) {
+    try {
+      var byr = Integer.parseInt(p.get("byr"));
+      var iyr = Integer.parseInt(p.get("iyr"));
+      var eyr = Integer.parseInt(p.get("eyr"));
+      var hgt = p.get("hgt");
+      return byr >= 1920 && byr <= 2002
+        && iyr >= 2010 && iyr <= 2020
+        && eyr >= 2020 && eyr <= 2030
+        && hgtValid(hgt)
+        && p.get("hcl").matches("^#[0-9-a-f]{6}$")
+        && List.of("amb","blu", "brn", "gry", "grn","hzl","oth").contains(p.get("ecl"))
+        && p.get("pid").matches("^\\d{9}$");
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  private boolean hgtValid(String hgt) {
+    if (hgt.contains("cm")) {
+      var h = Integer.parseInt(hgt.split("cm")[0]);
+      return h >= 150 && h <= 193;
+    }
+    if (hgt.contains("in")) {
+      var h = Integer.parseInt(hgt.split("in")[0]);
+      return h >= 59 && h <= 76;
     }
     return false;
   }
 
   @Override
   protected Object part2() {
-    return IntStream.rangeClosed(min, max)
-      .filter(this::isMonotonic)
-      .filter(this::hasDouble)
-      .filter(i -> rle(i).contains("2"))
-      .count();
-  }
-
-  private String rle(int n) {
-    String rle = "";
-    int adjacent = 1;
-    int cur;
-    int prev = n % 10;
-    n /= 10;
-    for (; n > 0; prev = cur, n /= 10) {
-      if (prev == (cur = n % 10)) {
-        adjacent++;
-      } else {
-        rle += adjacent;
-        adjacent = 1;
-      }
-    }
-    return rle + adjacent;
+    return passports.stream().filter(this::isValid2).count();
   }
 }

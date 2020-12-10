@@ -1,9 +1,11 @@
 import java.util.*;
-import java.util.stream.*;
+import java.util.regex.Pattern;
 
 public class Advent07 extends Advent {
 
-  long[] nums;
+  record Edge(String from, String to, int weight) {}
+
+  Set<Edge> edges = new HashSet<>();
 
   public Advent07() {
     super(7);
@@ -11,90 +13,51 @@ public class Advent07 extends Advent {
 
   @Override
   protected void parseInput() {
-    nums = Arrays.stream(input.get(0).split(","))
-      .mapToLong(Long::valueOf)
-      .toArray();
+    for (String line : input) {
+      var ss = line.split(" bags contain ");
+      var node = ss[0];
+      var rest = ss[1];
+      if (!rest.startsWith("no")) {
+        var children = rest.split(", ");
+        var p = Pattern.compile("(\\d+) ([a-z]+ [a-z]+) bags?\\.?");
+        for (var child : children) {
+          var m = p.matcher(child);
+          m.find();
+          edges.add(new Edge(node, m.group(2), Integer.parseInt(m.group(1))));
+        }
+      }
+    }
   }
 
   @Override
   protected Object part1() {
-    return findMax(0, 1, 2, 3, 4);
-  }
-
-  private long findMax(int... phaseSeed) {
-    long maxOutput = 0;
-    for (int[] phases : generatePhases(phaseSeed)) {
-      long output = findOutput(phases);
-      if (output > maxOutput) {
-        maxOutput = output;
-      }
-    }
-    return maxOutput;
-  }
-
-  private List<int[]> generatePhases(int[] source) {
-    List<int[]> result = new ArrayList<>();
-    permute(source.length, source, result);
-    return result;
-  }
-
-  private void permute(int k, int[] a, List<int[]> out) {
-    if (k == 1) {
-      out.add(Arrays.copyOf(a, a.length));
-    } else {
-      permute(k - 1, a, out);
-      for (int i = 0; i < k - 1; i++) {
-        if (k % 2 == 0) {
-          swap(a, i, k - 1);
-        } else {
-          swap(a, 0, k - 1);
+    var found = new HashSet<String>();
+    Queue<String> queue = new ArrayDeque<>();
+    queue.add("shiny gold");
+    while (!queue.isEmpty()) {
+      var current = queue.poll();
+      for (var edge : edges) {
+        if (edge.to.equals(current) && !found.contains(edge.from)) {
+          found.add(edge.from);
+          queue.add(edge.from);
         }
-        permute(k - 1, a, out);
       }
     }
-  }
-
-  private void swap(int[] input, int a, int b) {
-      int tmp = input[a];
-      input[a] = input[b];
-      input[b] = tmp;
-  }
-
-  private long findOutput(int[] phases) {
-    IntCodeMachine[] machines = initMachines(phases);
-    int machinePointer = 0;
-    long signal = 0;
-    while (!finished(machines)) {
-      IntCodeMachine machine = machines[machinePointer];
-      machine.input(signal);
-      machine.run();
-      signal = machine.output();
-      machinePointer = (machinePointer + 1) % 5;
-    }
-    return signal;
-  }
-
-  private IntCodeMachine[] initMachines(int[] phases) {
-    parseInput();
-    IntCodeMachine[] machines = new IntCodeMachine[phases.length];
-    for (int i = 0; i < phases.length; i++) {
-      machines[i] = new IntCodeMachine(nums);
-      machines[i].input(phases[i]);
-    }
-    return machines;
-  }
-
-  private boolean finished(IntCodeMachine[] machines) {
-    for (IntCodeMachine machine : machines) {
-      if (!machine.finished) {
-        return false;
-      }
-    }
-    return true;
+    return found.size();
   }
 
   @Override
   protected Object part2() {
-    return findMax(5, 6, 7, 8, 9);
+    return weightOf("shiny gold")-1;
+  }
+
+  private long weightOf(String node) {
+    var weight = 1L;
+    for (var edge : edges) {
+      if (edge.from.equals(node)) {
+        weight += edge.weight * weightOf(edge.to);
+      }
+    }
+    return weight;
   }
 }

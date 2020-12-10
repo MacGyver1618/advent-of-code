@@ -3,10 +3,10 @@ import java.util.stream.*;
 
 public class Advent08 extends Advent {
 
-  int WIDTH = 25;
-  int HEIGHT = 6;
-  int LAYERS;
-  int[][][] pixels;
+  List<Integer> history = new ArrayList<>();
+  boolean halted = false;
+
+  List<Instruction> instructions = new ArrayList<>();
 
   public Advent08() {
     super(8);
@@ -14,75 +14,69 @@ public class Advent08 extends Advent {
 
   @Override
   protected void parseInput() {
-    String in = input.get(0);
-    LAYERS = in.length() / (WIDTH * HEIGHT);
-    pixels = new int[WIDTH][HEIGHT][LAYERS];
-    for (int z = 0; z < LAYERS; z++) {
-      for (int y = 0; y < HEIGHT; y++) {
-        for (int x = 0; x < WIDTH; x++) {
-          int pos = z*HEIGHT*WIDTH + y*WIDTH + x;
-          pixels[x][y][z] = Integer.parseInt(in.substring(pos, pos+1));
-        }
-      }
+    for (String line : input) {
+      var ss = line.split(" ");
+      instructions.add(new Instruction(ss[0], Integer.parseInt(ss[1])));
     }
   }
 
   @Override
   protected Object part1() {
-    int fewestZeroes = Integer.MAX_VALUE;
-    int fewestZeroesAt = -1;
-    for (int z = 0; z < LAYERS; z++) {
-      int zeroCount = countZeroesAt(z);
-      if (zeroCount < fewestZeroes) {
-        fewestZeroes = zeroCount;
-        fewestZeroesAt = z;
-      }
-    }
-    return countOnesAt(fewestZeroesAt)*countTwosAt(fewestZeroesAt);
-  }
-
-  private int countZeroesAt(int layer) {
-    return countDigits(layer, 0);
-  }
-
-  private int countOnesAt(int layer) {
-    return countDigits(layer, 1);
-  }
-
-  private int countTwosAt(int layer) {
-    return countDigits(layer, 2);
-  }
-
-  private int countDigits(int layer, int digit) {
-    int count = 0;
-    for (int y = 0; y < HEIGHT; y++) {
-      for (int x = 0; x < WIDTH; x++) {
-        if (pixels[x][y][layer] == digit) {
-          count++;
-        }
-      }
-    }
-    return count;
+    return runLoop();
   }
 
   @Override
   protected Object part2() {
-    for (int y = 0; y < HEIGHT; y++) {
-      for (int x = 0; x < WIDTH; x++) {
-        sop(pixelAt(x,y), ' ');
+    halted = false;
+    int current = 0;
+    for (int i = 0; i < input.size(); i++) {
+      if (halted) return current;
+      var instruction = instructions.get(i);
+      switch (instruction.op) {
+        case "acc":
+          continue;
+        case "nop":
+          instructions.set(i, new Instruction("jmp", instruction.value));
+          current = runLoop();
+          instructions.set(i, instruction);
+          continue;
+        case "jmp":
+          instructions.set(i, new Instruction("nop", instruction.value));
+          current = runLoop();
+          instructions.set(i, instruction);
+          continue;
       }
-      sopl();
     }
-    return "See above";
+    return null;
   }
 
-  private char pixelAt(int x, int y) {
-    for (int z = 0; z < LAYERS; z++) {
-      int pixel = pixels[x][y][z];
-      if (pixel != 2) {
-        return pixel == 0 ? ' ' : '*';
+  private int runLoop() {
+    var state = new State(0,0);
+    history = new ArrayList<>();
+    while (true) {
+      if (state.pc == instructions.size()) {
+        halted = true;
+        return state.acc;
+      }
+      if (history.contains(state.pc)) return state.acc;
+      history.add(state.pc);
+      state = instructions.get(state.pc).execute(state);
+    }
+  }
+
+  record State(int pc, int acc) {}
+  record Instruction(String op, Integer value) {
+    State execute(State state) {
+      switch(op) {
+        case "nop":
+          return new State(state.pc+1, state.acc);
+        case "acc":
+          return new State(state.pc+1, state.acc+value);
+        case "jmp":
+          return new State(state.pc + value, state.acc);
+        default:
+          return state;
       }
     }
-    throw new IllegalStateException();
   }
 }

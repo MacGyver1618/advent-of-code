@@ -1,24 +1,41 @@
 from advent_lib import *
-from functools import reduce
 
-input = lines(8)[0]
-def chunk(arr, size):
-    return [arr[x:x+size] for x in range(0, len(arr), size)]
-layers = chunk(input, 150)
+input = lines(8)
 
-def count(layer, char):
-    return len(list(filter(lambda x: x == char, layer)))
+def loop():
+    pc = 0
+    acc = 0
+    history = []
+    while True:
+        if pc == len(input):
+            return True, acc
+        if pc in history:
+            return False, acc
+        history.append(pc)
+        op, amt = input[pc].split(" ")
+        if op == "nop":
+            pc += 1
+        elif op == "acc":
+            pc += 1
+            acc += int(amt)
+        elif op == "jmp":
+            pc += int(amt)
 
-digits = [(count(l, '0'), count(l, '1'), count(l, '2')) for l in layers]
+_, part1 = loop()
+print("Part 1:", part1)
 
-digits.sort()
-print("Part 1:", digits[0][1]*digits[0][2])
-
-def overlay(xs, ys):
-    return "".join([y if x == '2' else x for x,y in zip(xs,ys)])
-
-output = "".join(['*' if x == '1' else ' ' for x in reduce(overlay, layers)])
-
-print("Part 2")
-for line in chunk(output, 25):
-    print(line)
+for pos, instr in [(i, input[i]) for i in range(0, len(input))]:
+    op, amt = instr.split(" ")
+    if op == "nop":
+        input[pos] = " ".join(["jmp", amt])
+    elif op == "jmp":
+        input[pos] = " ".join(["nop", amt])
+    halted, result = loop()
+    if halted:
+        part2 = result
+        break
+    if op == "nop":
+        input[pos] = " ".join(["nop", amt])
+    elif op == "jmp":
+        input[pos] = " ".join(["jmp", amt])
+print("Part 2:", part2)

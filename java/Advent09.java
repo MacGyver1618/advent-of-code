@@ -1,9 +1,12 @@
 import java.util.*;
 import java.util.stream.*;
 
+import static java.util.Collections.max;
+import static java.util.Collections.min;
+
 public class Advent09 extends Advent {
 
-  long[] nums;
+  List<Long> nums = new ArrayList<>();
 
   public Advent09() {
     super(9);
@@ -11,28 +14,39 @@ public class Advent09 extends Advent {
 
   @Override
   protected void parseInput() {
-    nums = Arrays.stream(input.get(0).split(","))
-      .mapToLong(Long::valueOf)
-      .toArray();
+    nums = input.stream()
+      .map(Long::valueOf)
+      .collect(Collectors.toList());
   }
 
   @Override
   protected Object part1() {
-    IntCodeMachine machine = new IntCodeMachine(nums);
-    machine.input(1L);
-    while (!machine.finished) {
-      machine.run();
-    }
-    return machine.output();
+    return IntStream.range(25, nums.size())
+      .filter(this::valid)
+      .mapToLong(nums::get)
+      .findFirst()
+      .getAsLong();
+  }
+
+  private boolean valid(int i) {
+    var sublist = nums.subList(i-25,i);
+    return sublist.stream()
+      .flatMap(n -> sublist.stream().map(l -> l.longValue() + n))
+      .noneMatch(nums.get(i)::equals);
   }
 
   @Override
   protected Object part2() {
-    IntCodeMachine machine = new IntCodeMachine(nums);
-    machine.input(2L);
-    while (!machine.finished) {
-      machine.run();
+    var target = (long) part1();
+    int s = nums.size();
+    for (int l = 2; l < s; l++) {
+      for (int i = 0; i < s-l; i++) {
+        var sublist = nums.subList(i, i+l);
+        if (sublist.stream().mapToLong(Long::longValue).sum() == target) {
+          return min(sublist)+max(sublist);
+        }
+      }
     }
-    return machine.output();
+    return null;
   }
 }

@@ -2,3 +2,8 @@
 *.dot
 aoc.cookie
 __pycache__
+.idea
+*.iml
+out
+lib
+venv

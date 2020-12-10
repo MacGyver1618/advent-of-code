@@ -1,10 +1,10 @@
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.*;
 
 public class Advent02 extends Advent {
 
-  int pc = 0;
-  int[] nums;
+  public static final String REGEX = "(\\d+)-(\\d+) (.): (.+)";
 
   public Advent02() {
     super(2);
@@ -12,57 +12,45 @@ public class Advent02 extends Advent {
 
   @Override
   protected void parseInput() {
-    nums = Arrays.stream(input.get(0).split(","))
-      .mapToInt(Integer::valueOf)
-      .toArray();
-    pc = 0;
+
   }
 
   @Override
   protected Object part1() {
-    return runProgram(12, 2);
+    return "" + input.stream()
+      .filter(this::isValid)
+      .count();
+  }
+
+  boolean isValid(String s) {
+    var p = Pattern.compile(REGEX);
+    var m = p.matcher(s);
+    m.find();
+    var sCount = m.group(4).chars().filter(c -> c == m.group(3).charAt(0)).count();
+    int min = Integer.parseInt(m.group(1));
+    int max = Integer.parseInt(m.group(2));
+    return sCount >= min && sCount <= max;
   }
 
   @Override
   protected Object part2() {
-    for (int noun = 0; noun < 100; noun++) {
-      for (int verb = 0; verb < 100; verb++) {
-        if (runProgram(noun, verb) == 19690720) {
-          return 100*noun + verb;
-        }
-      }
-    }
-    return null;
+    return "" + input.stream()
+      .filter(this::isValid2)
+      .count();
   }
 
-  private int runProgram(int a, int b) {
-    parseInput();
-    nums[1] = a;
-    nums[2] = b;
-    runProgram();
-    return nums[0];
-  }
-
-  private void runProgram() {
-    int op1, op2, target;
-    while (true) {
-      switch (nums[pc]) {
-        case 1:
-          op1 = nums[nums[pc + 1]];
-          op2 = nums[nums[pc + 2]];
-          target = nums[pc + 3];
-          nums[target] = op1 + op2;
-          break;
-        case 2:
-          op1 = nums[nums[pc + 1]];
-          op2 = nums[nums[pc + 2]];
-          target = nums[pc + 3];
-          nums[target] = op1 * op2;
-          break;
-        case 99:
-          return;
-      }
-      pc += 4;
+  boolean isValid2(String s) {
+    try {
+      var p = Pattern.compile(REGEX);
+      var m = p.matcher(s);
+      m.find();
+      int min = Integer.parseInt(m.group(1));
+      int max = Integer.parseInt(m.group(2));
+      var pw = m.group(4);
+      char c = m.group(3).charAt(0);
+      return pw.charAt(min-1) == c ^ pw.charAt(max-1) == c;
+    } catch (Exception e) {
+      return false;
     }
   }
 }
