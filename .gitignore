@@ -5,5 +5,5 @@ __pycache__
 .idea
 *.iml
 out
-lib
+2020/lib
 venv

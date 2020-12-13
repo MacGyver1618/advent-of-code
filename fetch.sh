@@ -1,9 +1,14 @@
 #!/bin/bash
+
+function fetch() {
+    day=$1
+    day2="$(seq -f %02g $day $day)"
+    year=$2
+    curl -vv --create-dirs --header "Cookie: $(cat aoc.cookie)" "https://adventofcode.com/$year/day/$day/input" -o "$year/input/$day2.txt"
+}
+
 if [ $# -eq 0 ]; then
-  curl -s --create-dirs --header "Cookie: $(cat aoc.cookie)" "https://adventofcode.com/2020/day/$(date +%-d)/input" -o "input/$(date +%d).txt"
+  fetch "$(date +%-d)" "$(date +%Y)"
 else
-  for day in $* 
-  do
-    curl -s --create-dirs --header "Cookie: $(cat aoc.cookie)" "https://adventofcode.com/2020/day/$day/input" -o "input/$(seq -f %02g $day $day).txt"
-  done
+  fetch "$1" "$2"
 fi

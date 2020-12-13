@@ -19,3 +19,6 @@ def union(iterable):
 def powerset(iterable):
     s = list(iterable)
     return it.chain.from_iterable(it.combinations(s, r) for r in range(len(s)+1))
+
+def product(iterable):
+    return func.reduce(lambda a,x: a*x, iterable)

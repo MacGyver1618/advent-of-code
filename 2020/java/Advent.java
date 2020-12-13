@@ -47,6 +47,42 @@ public abstract class Advent {
     } catch (Exception e) {}
   }
 
+  protected char[][] readCharGrid() {
+    var grid = new char[input.get(0).length()][input.size()];
+    for (int y = 0; y < input.size(); y++) {
+      var line = input.get(y);
+      for (int x = 0; x < line.length(); x++) {
+        grid[x][y] = line.charAt(x);
+      }
+    }
+    return grid;
+  }
+
+  void printGrid(char[][] grid) {
+    int xMax = grid.length-1;
+    int yMax = grid[0].length-1;
+    var sb = new StringBuilder();
+    for (int y = 0; y <=yMax; y++) {
+      for (int x = 0; x <= xMax; x++) {
+        sb.append(grid[x][y]);
+      }
+      sb.append('\n');
+    }
+    sopl(sb);
+  }
+
+  List<Point> pointsIn(char[][] grid) {
+    var result = new ArrayList<Point>();
+    int xMax = grid.length-1;
+    int yMax = grid[0].length-1;
+    for (int y = 0; y <=yMax; y++) {
+      for (int x = 0; x <= xMax; x++) {
+        result.add(new Point(x,y));
+      }
+    }
+    return result;
+  }
+
   protected static void pause() {
     readString();
   }

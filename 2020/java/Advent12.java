@@ -1,10 +1,11 @@
 import java.util.*;
+import java.util.regex.*;
 import java.util.stream.*;
 
-public class Advent11 extends Advent {
+public class Advent12 extends Advent {
 
-  public Advent11() {
-    super(11);
+  public Advent12() {
+    super(12);
   }
 
   @Override
