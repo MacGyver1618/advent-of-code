@@ -1,6 +1,5 @@
 import functools as func
 import itertools as it
-from numpy import array as A
 
 def full_input(day):
     return str(open("../input/%02d.txt" % day).read())
@@ -24,12 +23,8 @@ def powerset(iterable):
 def product(iterable):
     return func.reduce(lambda a,x: a*x, iterable)
 
-directions = {
-    "N": A([0, -1]),
-    "E": A([1, 0]),
-    "S": A([0, 1]),
-    "W": A([-1, 0])
-}
-R = A([[0, -1],
-       [ 1, 0]])
-L = R.T
+def iterate(f, seed):
+    value = seed
+    while True:
+        yield value
+        value = f(value)
