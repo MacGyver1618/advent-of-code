@@ -1,5 +1,6 @@
 import functools as func
 import itertools as it
+from numpy import array as A
 
 def full_input(day):
     return str(open("../input/%02d.txt" % day).read())

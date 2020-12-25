@@ -48,35 +48,30 @@ rights = union([set(re.split(r"(?=[A-Z])(?<!^)", m)) for _,m in rules])
 initials = [i for i in lefts if i not in rights]
 terminals = [i for i in rights if i not in lefts]
 intermediates = lefts.union(rights)
-#rules = [(a,m) for a,m in rules if not m.startswith("CRn")]
-o = []
-for _,m in rules:
-    s = ""
-    for atom in re.split(r"(?=[A-Z])(?<!^)", m):
+
+steps = 0
+atoms = atoms_of(mol)
+# No replacement starts with a terminal other than C, which isn't in the output
+# Therefore, we can assume the start with a intermediate
+s = mol
+while len(s) > 2:
+    s2 = ""
+    # Reduce strings of intermediates to single intermediate, counting iterations
+    for atom in atoms_of(s):
         if atom in terminals:
-            s += "T"
+            s2 += "S"
+            s2 += atom
+            steps -= 1
         else:
-            s += "s"
-    o.append(s)
-dist = {mol: 0}
-Q = []
-seen = set()
+            steps += 1
+    # Replace occurrences of SRnSAr and SRnSYSAr with S
+    steps += s2.count("SRnSAr")
+    s2 = s2.replace("SRnSAr", "S")
+    steps += s2.count("SRnSYSAr")
+    s2 = s2.replace("SRnSYSAr", "S")
+    s = s2
 
-Q.append((len(mol), mol))
-seen.add(mol)
+# The final (first) step taken was e => SS
+steps += 1
 
-min = 506
-while Q:
-    _,v = heapq.heappop(Q)
-    if len(v) < min:
-        min = len(v)
-        print(len(v))
-    if v == "e":
-        break
-    for w in parents(v):
-        if w not in seen:
-            dist[w] = dist[v] + 1
-            seen.add(w)
-            Q.append((len(w),w))
-
-print("Part 2:", dist["e"])
+print("Part 2:", steps)
