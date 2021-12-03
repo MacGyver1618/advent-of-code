@@ -8,10 +8,12 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(1)
+inpt = to_nums(lines(1))
 
-part1 = 0
+part1 = sum([1 for i in range(1,len(inpt)) if inpt[i] > inpt[i-1]])
+
 print("Part 1:", part1)
 
-part2 = 0
+part2 = sum([1 for i in range(3,len(inpt)) if inpt[i] > inpt[i-3]])
+
 print("Part 2:", part2)
