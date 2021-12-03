@@ -28,8 +28,16 @@ directions = {
     "N": A([0, -1]),
     "E": A([1, 0]),
     "S": A([0, 1]),
-    "W": A([-1, 0])
+    "W": A([-1, 0]),
+    "U": A([0, -1]),
+    "R": A([1, 0]),
+    "D": A([0, 1]),
+    "L": A([-1, 0])
 }
+O = A([0,0])
 R = A([[0, -1],
        [ 1, 0]])
 L = R.T
+
+abc = "abcdefghijklmnopqrstuvwxyz"
+ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
