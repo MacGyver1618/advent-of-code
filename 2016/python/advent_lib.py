@@ -24,6 +24,12 @@ def powerset(iterable):
 def product(iterable):
     return func.reduce(lambda a,x: a*x, iterable)
 
+def first(iterable):
+    return iterable[0]
+
+def second(iterable):
+    return iterable[1]
+
 directions = {
     "N": A([0, -1]),
     "E": A([1, 0]),
