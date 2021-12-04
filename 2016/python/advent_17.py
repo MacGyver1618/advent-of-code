@@ -1,4 +1,4 @@
-from advent_lib import *
+from common.advent_lib import *
 import hashlib
 import collections as coll
 import functools as func

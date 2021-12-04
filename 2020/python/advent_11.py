@@ -1,4 +1,4 @@
-from advent_lib import *
+from common.advent_lib import *
 from collections import *
 from functools import lru_cache
 import heapq

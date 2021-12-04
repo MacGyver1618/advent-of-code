@@ -1,5 +1,5 @@
 from collections import defaultdict, deque
-from advent_lib import *
+from common.advent_lib import *
 
 inpt = lines(21)
 

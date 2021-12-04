@@ -1,4 +1,4 @@
-from advent_lib import *
+from common.advent_lib import *
 from collections import deque
 
 player1 = deque(to_nums(lines(22)[1:26]))

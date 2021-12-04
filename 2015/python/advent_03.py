@@ -1,4 +1,4 @@
-from advent_lib import *
+from common.advent_lib import *
 from numpy import array as A
 
 inpt = lines(3)[0]

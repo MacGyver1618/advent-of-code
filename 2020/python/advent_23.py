@@ -1,6 +1,6 @@
 from time import time
 
-from advent_lib import *
+from common.advent_lib import *
 import collections as coll
 import functools as func
 import itertools as it

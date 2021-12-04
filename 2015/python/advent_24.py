@@ -1,4 +1,4 @@
-from advent_lib import *
+from common.advent_lib import *
 
 inpt = to_nums(lines(24))
 

@@ -1,5 +1,5 @@
 import re
-from advent_lib import *
+from common.advent_lib import *
 from collections import deque
 
 input = lines(7)

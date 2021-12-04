@@ -1,4 +1,4 @@
-from advent_lib import *
+from common.advent_lib import *
 from sympy.ntheory.modular import crt
 
 inpt = lines(13)

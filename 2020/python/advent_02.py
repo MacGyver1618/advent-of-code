@@ -1,4 +1,4 @@
-from advent_lib import *
+from common.advent_lib import *
 import itertools as iter
 import re
 

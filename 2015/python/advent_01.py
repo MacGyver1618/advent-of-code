@@ -1,4 +1,4 @@
-from advent_lib import *
+from common.advent_lib import *
 
 inpt = lines(1)[0]
 

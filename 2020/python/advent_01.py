@@ -1,4 +1,4 @@
-from advent_lib import *
+from common.advent_lib import *
 
 nums = to_nums(lines(1))
 

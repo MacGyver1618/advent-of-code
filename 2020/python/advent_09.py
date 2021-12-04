@@ -1,4 +1,4 @@
-from advent_lib import *
+from common.advent_lib import *
 import itertools as it
 
 input = to_nums(lines(9))
