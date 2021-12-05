@@ -1,5 +1,6 @@
 import functools as func
 import itertools as it
+import operator as op
 from numpy import array as A
 
 def full_input(day):
@@ -47,3 +48,15 @@ L = R.T
 
 abc = "abcdefghijklmnopqrstuvwxyz"
 ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+def inc(n):
+    return n+1
+
+def dec(n):
+    return n-1
+
+def manhattan_distance(a, b):
+    return sum([abs(op.sub(*x)) for x in zip(a,b)])
+
+def sgn(n):
+    return -1 if n < 0 else 1
