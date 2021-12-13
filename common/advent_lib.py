@@ -1,6 +1,9 @@
+import collections
 import functools as func
 import itertools as it
 import operator as op
+import queue
+
 from numpy import array as A
 
 def full_input(day):
@@ -60,3 +63,47 @@ def manhattan_distance(a, b):
 
 def sgn(n):
     return -1 if n < 0 else 1
+
+def bfs(current, goal, neighbor_fn):
+    Q = collections.deque()
+    seen = set()
+    came_from = {}
+    Q.append(current)
+    while Q:
+        node = Q.popleft()
+        if node == goal:
+            return reconstruct_path(node, came_from)
+        for neighbor in neighbor_fn(node):
+            if neighbor not in seen:
+                seen.add(neighbor)
+                Q.append(neighbor)
+
+
+def reconstruct_path(node, came_from):
+    path = collections.deque([node])
+    while node in came_from:
+        node = came_from[node]
+        path.appendleft(node)
+    return path
+
+def a_star(start, goal_fn, neighbor_fn, dist_fn, heur_fn):
+    open_set = queue.PriorityQueue()
+    open_set.put((heur_fn(start), start))
+    came_from = {}
+    g_score = collections.defaultdict(lambda: float("inf"))
+    g_score[start] = 0
+
+    while not open_set.empty():
+        current = open_set.get()[1] # Priority queues return (prio, elem) tuples
+        if goal_fn(current):
+            return reconstruct_path(came_from, current)
+
+        for neighbor in neighbor_fn(current):
+            tentative_gscore = g_score[current] + dist_fn(current, neighbor)
+            if tentative_gscore < g_score[neighbor]:
+                came_from[neighbor] = current
+                g_score[neighbor] = tentative_gscore
+                f_score = tentative_gscore + heur_fn(neighbor)
+                open_set.put((f_score, neighbor))
+
+    raise Exception

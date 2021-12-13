@@ -10,11 +10,11 @@ import sympy as sym
 
 inpt = lines(5)
 
-vents = set()
+vents = []
 
 for line in inpt:
     a,b,c,d = map(int, re.match(r"(\d+),(\d+) -> (\d+),(\d+)", line).groups())
-    vents.add(((a,b),(c,d)))
+    vents.append((A((a,b)),A((c,d))))
 
 covers = coll.defaultdict(lambda: 0)
 
@@ -36,17 +36,10 @@ print("Part 1:", part1)
 covers = coll.defaultdict(lambda: 0)
 
 for vent in vents:
-    (x1,y1),(x2,y2) = vent
-    xdiff = x2-x1
-    ydiff = y2-y1
-    sign_x = sgn(xdiff)
-    sign_y = sgn(ydiff)
-    x,y = x1,y1
-    covers[(x,y)] += 1
-    for i in range(max(map(abs, [xdiff, ydiff]))):
-        x += sign_x if xdiff != 0 else 0
-        y += sign_y if ydiff != 0 else 0
-        covers[(x,y)] += 1
+    a,b = vent
+    d = np.sign(b-a)
+    for point in [a + p*d for p in range(max(abs(b-a))+1)]:
+        covers[tuple(point)] += 1
 
 part2 = len([x for (x,y) in covers.items() if y > 1])
 print("Part 2:", part2)
