@@ -45,9 +45,13 @@ directions = {
     "L": A([-1, 0])
 }
 O = A([0,0])
-R = A([[0, -1],
+R_turn = A([[0, -1],
        [ 1, 0]])
-L = R.T
+L_turn = R_turn.T
+U = directions["U"]
+D = directions["D"]
+L = directions["L"]
+R = directions["R"]
 
 abc = "abcdefghijklmnopqrstuvwxyz"
 ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -96,7 +100,7 @@ def a_star(start, goal_fn, neighbor_fn, dist_fn, heur_fn):
     while not open_set.empty():
         current = open_set.get()[1] # Priority queues return (prio, elem) tuples
         if goal_fn(current):
-            return reconstruct_path(came_from, current)
+            return reconstruct_path(current, came_from)
 
         for neighbor in neighbor_fn(current):
             tentative_gscore = g_score[current] + dist_fn(current, neighbor)
@@ -107,3 +111,9 @@ def a_star(start, goal_fn, neighbor_fn, dist_fn, heur_fn):
                 open_set.put((f_score, neighbor))
 
     raise Exception
+
+def adjacent(p):
+    return [p+d for d in [U,D,L,R]]
+
+def adjacent_diag(p):
+    return [p+d for d in [U,D,L,R,U+R,U+L,D+R,D+L]]
