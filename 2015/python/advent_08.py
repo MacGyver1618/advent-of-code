@@ -1,6 +1,6 @@
 from common.advent_lib import *
 
-inpt = lines(8)
+inpt = read_lines(8)
 
 print(inpt)
 tot = 0

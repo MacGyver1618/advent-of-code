@@ -2,7 +2,7 @@ from common.advent_lib import *
 import itertools as iter
 import re
 
-lines = lines(2)
+lines = read_lines(2)
 
 def matches(s):
     min, max, char, pw = re.match(r"(\d+)-(\d+) (.): (.+)", s).groups()

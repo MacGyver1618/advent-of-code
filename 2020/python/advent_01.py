@@ -1,6 +1,6 @@
 from common.advent_lib import *
 
-nums = to_nums(lines(1))
+nums = to_nums(read_lines(1))
 
 part1 = [ x*y for x in nums for y in nums if x + y == 2020 ][0]
 print("Part 1: ", part1)

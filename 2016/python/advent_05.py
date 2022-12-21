@@ -9,7 +9,7 @@ import numpy as np
 import sympy as sym
 from hashlib import md5
 
-inpt = lines(5)[0]
+inpt = read_lines(5)[0]
 
 i = 0
 pw = ""

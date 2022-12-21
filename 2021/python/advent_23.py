@@ -11,7 +11,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(23)
+inpt = read_lines(23)
 
 grid = defaultdict(lambda: " ")
 

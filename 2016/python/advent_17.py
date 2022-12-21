@@ -9,7 +9,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-passcode = lines(17)[0]
+passcode = read_lines(17)[0]
 
 OPEN = "bcdef"
 

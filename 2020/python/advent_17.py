@@ -1,7 +1,7 @@
-from advent_lib import lines
+from common.advent_lib import read_lines
 import collections as coll
 
-inpt = lines(17)
+inpt = read_lines(17)
 
 grid = []
 

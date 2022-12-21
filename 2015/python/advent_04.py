@@ -2,7 +2,7 @@ from common.advent_lib import *
 import itertools as it
 import hashlib
 
-inpt = lines(4)[0]
+inpt = read_lines(4)[0]
 
 def md5(s):
     return hashlib.md5(s.encode("utf-8")).hexdigest()

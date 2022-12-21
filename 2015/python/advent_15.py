@@ -9,7 +9,7 @@ import numpy as np
 import sympy as sym
 from numpy import array as A
 
-inpt = lines(15)
+inpt = read_lines(15)
 ingredients = []
 for line in inpt:
     name, rest = line.split(": ")

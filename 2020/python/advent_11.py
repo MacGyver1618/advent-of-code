@@ -58,7 +58,7 @@ def step2(grid):
 
 
 def main():
-    grid = [list(line.strip()) for line in lines(11) if line.strip()]
+    grid = [list(line.strip()) for line in read_lines(11) if line.strip()]
 
     while True:
         nxt = step1(grid)
@@ -69,7 +69,7 @@ def main():
 
     print(h(grid).count("#"))
 
-    grid = [list(line.strip()) for line in lines(11) if line.strip()]
+    grid = [list(line.strip()) for line in read_lines(11) if line.strip()]
     while True:
         nxt = step2(grid)
         if h(nxt) == h(grid):

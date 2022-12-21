@@ -1,7 +1,7 @@
 from collections import defaultdict, deque
 from common.advent_lib import *
 
-inpt = lines(21)
+inpt = read_lines(21)
 
 ingredients = set()
 recipes = []

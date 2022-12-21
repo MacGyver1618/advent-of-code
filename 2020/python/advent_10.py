@@ -1,7 +1,7 @@
 from common.advent_lib import *
 import itertools as it
 
-nums = to_nums(lines(10))
+nums = to_nums(read_lines(10))
 nums.append(0)
 nums.append(max(nums)+3)
 nums = sorted(nums)

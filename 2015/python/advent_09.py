@@ -5,7 +5,7 @@ import itertools as it
 import numpy as np
 import sympy as sym
 
-inpt = lines(9)
+inpt = read_lines(9)
 
 vertices = set()
 dists = {}

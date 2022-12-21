@@ -9,7 +9,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(21)
+inpt = read_lines(21)
 p1start = int(inpt[0].split()[-1])
 p2start = int(inpt[1].split()[-1])
 

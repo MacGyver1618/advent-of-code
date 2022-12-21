@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(20)
+inpt = read_lines(20)
 
 def to_range(s):
     return tuple(map(int, re.match(r"(\d+)-(\d+)", s).groups()))

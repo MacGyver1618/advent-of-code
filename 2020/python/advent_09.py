@@ -1,7 +1,7 @@
 from common.advent_lib import *
 import itertools as it
 
-input = to_nums(lines(9))
+input = to_nums(read_lines(9))
 
 def valid(n):
     prev = input[n-25:n]

@@ -1,14 +1,8 @@
-from common.advent_lib import *
-import collections as coll
-import functools as func
-import itertools as it
-import operator as oper
 import re
-import more_itertools as it2
-import numpy as np
-import sympy as sym
 
-inpt = lines(1)[0].split(", ")
+from common.advent_lib import *
+
+inpt = read_lines(1)[0].split(", ")
 
 p = 0
 dir = 1
@@ -22,7 +16,7 @@ for i in inpt:
     while p != dest:
         p += dir
         if part2 == None and p in history:
-            print(p)
+            # print(p)
             part2 = p
         history.add(p)
 

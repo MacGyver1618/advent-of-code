@@ -10,7 +10,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(13)
+inpt = read_lines(13)
 fav = int(inpt[0])
 
 def ptos(p):

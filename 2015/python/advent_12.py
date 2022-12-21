@@ -9,7 +9,7 @@ import sympy as sym
 import json
 import collections as coll
 
-inpt = lines(12)[0]
+inpt = read_lines(12)[0]
 
 nums = re.split(r"[^-0-9]+", inpt)[1:-1]
 

@@ -2,7 +2,7 @@ import re
 from common.advent_lib import *
 from collections import deque
 
-input = lines(7)
+input = read_lines(7)
 
 edges = set()
 

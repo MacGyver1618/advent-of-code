@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(6)
+inpt = read_lines(6)
 
 poss = coll.defaultdict(coll.Counter)
 

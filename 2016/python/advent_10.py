@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(10)
+inpt = read_lines(10)
 
 edges = set()
 values = coll.defaultdict(list)

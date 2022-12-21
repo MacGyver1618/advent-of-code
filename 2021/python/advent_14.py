@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(14)
+inpt = read_lines(14)
 
 seed = inpt[0]
 

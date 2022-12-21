@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(21)
+inpt = read_lines(21)
 
 res = [
     r"swap position (.) with position (.)",

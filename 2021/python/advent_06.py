@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-fish = to_nums(lines(6)[0].split(","))
+fish = to_nums(read_lines(6)[0].split(","))
 counts = [fish.count(i) for i in range(9)]
 
 for i in range(256):

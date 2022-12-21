@@ -1,6 +1,6 @@
 from common.advent_lib import *
 
-inpt = lines(1)[0]
+inpt = read_lines(1)[0]
 
 print("Part 1:", inpt.count("(")-inpt.count(")"))
 

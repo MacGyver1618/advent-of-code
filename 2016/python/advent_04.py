@@ -1,14 +1,11 @@
-from common.advent_lib import *
 import collections as coll
-import functools as func
-import itertools as it
-import operator as oper
 import re
-import more_itertools as it2
-import numpy as np
-import sympy as sym
 
-I = lines(4)
+import more_itertools as it2
+
+from common.advent_lib import *
+
+I = read_lines(4)
 
 tot = 0
 reals = []

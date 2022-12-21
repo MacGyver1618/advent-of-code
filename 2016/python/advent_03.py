@@ -1,14 +1,8 @@
-from common.advent_lib import *
-import collections as coll
-import functools as func
-import itertools as it
-import operator as oper
 import re
-import more_itertools as it2
-import numpy as np
-import sympy as sym
 
-I = lines(3)
+from common.advent_lib import *
+
+I = read_lines(3)
 tris = [to_nums(re.findall(r"\d+", l)) for l in I]
 
 def is_triangle(arr):

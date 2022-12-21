@@ -1,7 +1,7 @@
 from common.advent_lib import *
 from sympy.ntheory.modular import crt
 
-inpt = lines(13)
+inpt = read_lines(13)
 min_time = int(inpt[0])
 timestamps = inpt[1].split(",")
 nums = [int(t) for t in timestamps if t != 'x']

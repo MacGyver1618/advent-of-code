@@ -7,7 +7,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(10)[0]
+inpt = read_lines(10)[0]
 
 def rle(s):
     gs = re.split(r"(?<=(.))(?!\1)", s)[:-1:2]

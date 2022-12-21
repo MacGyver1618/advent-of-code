@@ -10,7 +10,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-cups = coll.deque(to_nums(lines(23)[0][:]))
+cups = coll.deque(to_nums(read_lines(23)[0][:]))
 
 for _ in range(100):
     current = cups.popleft()
@@ -34,7 +34,7 @@ cups.popleft()
 
 print("Part 1:", "".join(map(str, cups)))
 
-cups = coll.deque(to_nums(lines(23)[0][:]))
+cups = coll.deque(to_nums(read_lines(23)[0][:]))
 cups.extend(range(10,1_000_001))
 nexts = cups.copy()
 nexts.rotate(-1)

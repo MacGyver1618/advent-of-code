@@ -9,7 +9,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(25)
+inpt = read_lines(25)
 east = set()
 south = set()
 for r, line in enumerate(inpt):

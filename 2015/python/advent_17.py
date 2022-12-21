@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = to_nums(lines(17))
+inpt = to_nums(read_lines(17))
 
 sets = [comb for comb in powerset(inpt) if sum(comb) == 150]
 part1 = len(sets)

@@ -10,7 +10,7 @@ import sympy as sym
 import json
 import math
 
-inpt = [*map(json.loads, lines(18))]
+inpt = [*map(json.loads, read_lines(18))]
 
 nums = "1234567890"
 

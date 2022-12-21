@@ -2,7 +2,7 @@ from common.advent_lib import *
 import re
 import numpy as np
 
-inpt = lines(6)
+inpt = read_lines(6)
 grid = np.zeros((1000,1000), dtype=int)
 
 for instr in inpt:

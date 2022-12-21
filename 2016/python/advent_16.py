@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-init = lines(16)[0]
+init = read_lines(16)[0]
 
 def expand(s):
     return s + "0" + "".join(["1" if x == "0" else "0" for x in reversed(s)])

@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(16)
+inpt = read_lines(16)
 
 sues = coll.defaultdict(lambda: coll.defaultdict(lambda: -1))
 for line in inpt:

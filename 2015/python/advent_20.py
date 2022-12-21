@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = to_nums(lines(20))[0]
+inpt = to_nums(read_lines(20))[0]
 
 part1 = 0
 

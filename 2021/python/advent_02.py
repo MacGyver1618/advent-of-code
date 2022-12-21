@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(2)
+inpt = read_lines(2)
 
 depth = 0
 pos = 0

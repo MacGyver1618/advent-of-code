@@ -1,14 +1,6 @@
 from common.advent_lib import *
-import collections as coll
-import functools as func
-import itertools as it
-import operator as oper
-import re
-import more_itertools as it2
-import numpy as np
-import sympy as sym
 
-inpt = lines(2)
+inpt = read_lines(2)
 
 keypad = {
     (0,0): 1,

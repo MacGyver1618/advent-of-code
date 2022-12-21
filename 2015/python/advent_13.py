@@ -7,7 +7,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(13)
+inpt = read_lines(13)
 prefs = {}
 people = set()
 for line in inpt:

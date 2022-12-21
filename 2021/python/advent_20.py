@@ -9,7 +9,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(20)
+inpt = read_lines(20)
 
 alg = inpt[0]
 grid = defaultdict(lambda: ".")

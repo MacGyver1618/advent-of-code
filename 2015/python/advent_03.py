@@ -1,7 +1,7 @@
 from common.advent_lib import *
 from numpy import array as A
 
-inpt = lines(3)[0]
+inpt = read_lines(3)[0]
 
 p = A([0,0])
 presents = {}

@@ -7,7 +7,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(11)[0]
+inpt = read_lines(11)[0]
 
 abc = "abcdefghijklmnopqrstuvwxyz"
 triples = list(map("".join, zip(abc, abc[1:], abc[2:])))

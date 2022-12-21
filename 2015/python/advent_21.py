@@ -38,7 +38,7 @@ rings = [
     ("Defense +3",   80,     0,       3)
 ]
 
-inpt = lines(21)
+inpt = read_lines(21)
 hp = int(inpt[0].split(": ")[1])
 dm = int(inpt[1].split(": ")[1])
 ar = int(inpt[2].split(": ")[1])

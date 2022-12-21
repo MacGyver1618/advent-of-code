@@ -1,8 +1,8 @@
 from common.advent_lib import *
 from collections import deque
 
-player1 = deque(to_nums(lines(22)[1:26]))
-player2 = deque(to_nums(lines(22)[28:]))
+player1 = deque(to_nums(read_lines(22)[1:26]))
+player2 = deque(to_nums(read_lines(22)[28:]))
 
 while player1 and player2:
     p1 = player1.popleft()
@@ -22,8 +22,8 @@ print("Part 1:", score(player1) if player1 else score(player2))
 
 
 
-player1 = deque(to_nums(lines(22)[1:26]))
-player2 = deque(to_nums(lines(22)[28:]))
+player1 = deque(to_nums(read_lines(22)[1:26]))
+player2 = deque(to_nums(read_lines(22)[28:]))
 
 def play_game(deck1, deck2):
     history = set()

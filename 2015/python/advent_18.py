@@ -9,7 +9,7 @@ import numpy as np
 import sympy as sym
 from numpy import array as A
 
-inpt = A([*map(list, lines(18))])
+inpt = A([*map(list, read_lines(18))])
 ymax,xmax = inpt.shape
 
 def evolve(grid):

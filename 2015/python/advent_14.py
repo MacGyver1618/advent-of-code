@@ -7,7 +7,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(14)
+inpt = read_lines(14)
 regex = r"(\w+) can fly (\d+) km/s for (\d+) seconds, but then must rest for (\d+) seconds\."
 
 reindeer = {}

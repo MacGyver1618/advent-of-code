@@ -2,7 +2,7 @@ from common.advent_lib import *
 import itertools as iter
 import math
 
-input = lines(3)
+input = read_lines(3)
 
 def slope(ystep, xstep):
     return sum([1 for (x,y) in zip(range(0,xstep*len(input),xstep), range(0,len(input),ystep)) if input[y][x % len(input[y])] == '#'])

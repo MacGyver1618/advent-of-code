@@ -1,7 +1,7 @@
 from common.advent_lib import *
 import re
 
-inpt = lines(14)
+inpt = read_lines(14)
 
 mem = {}
 

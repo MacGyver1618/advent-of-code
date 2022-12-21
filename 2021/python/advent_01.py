@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = to_nums(lines(1))
+inpt = to_nums(read_lines(1))
 
 part1 = sum([1 for i in range(1,len(inpt)) if inpt[i] > inpt[i-1]])
 

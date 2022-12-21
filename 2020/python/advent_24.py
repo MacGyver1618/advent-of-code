@@ -3,7 +3,7 @@ import re
 
 from common.advent_lib import *
 
-inpt = lines(24)
+inpt = read_lines(24)
 
 dirs = {
     "e":  A([-1,0,1]),

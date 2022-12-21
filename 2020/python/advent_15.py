@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(15)[0].split(",")
+inpt = read_lines(15)[0].split(",")
 
 history = [*map(int, inpt)]
 for i in range(len(history)+1,2021):

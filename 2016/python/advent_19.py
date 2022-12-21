@@ -10,7 +10,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-num_elves = int(lines(19)[0])
+num_elves = int(read_lines(19)[0])
 
 as_binary = "{0:b}".format(num_elves)
 

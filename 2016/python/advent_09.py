@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(9)[0]
+inpt = read_lines(9)[0]
 file = inpt
 
 ver1 = 0

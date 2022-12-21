@@ -1,6 +1,6 @@
 from common.advent_lib import *
 
-inpt = lines(2)
+inpt = read_lines(2)
 
 area = 0
 ribbon = 0

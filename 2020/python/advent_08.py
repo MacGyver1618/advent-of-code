@@ -1,6 +1,6 @@
 from common.advent_lib import *
 
-input = lines(8)
+input = read_lines(8)
 
 def loop():
     pc = 0

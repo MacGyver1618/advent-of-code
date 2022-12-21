@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(17)
+inpt = read_lines(17)
 
 xmin, xmax, ymin, ymax = map(int, re.match(r"target area: x=(\d+)\.\.(\d+), y=(-\d+)\.\.(-\d+)", inpt[0]).groups())
 

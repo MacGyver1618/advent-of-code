@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(3)
+inpt = read_lines(3)
 
 bits = [0,0,0,0,0,0,0,0,0,0,0,0]
 

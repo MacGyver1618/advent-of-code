@@ -2,7 +2,7 @@ from common.advent_lib import *
 import re
 from numpy import array as A
 
-actions = lines(12)
+actions = read_lines(12)
 
 ds = {
     "N": A([0, -1]),

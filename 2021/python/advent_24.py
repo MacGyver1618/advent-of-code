@@ -10,7 +10,7 @@ import numpy as np
 import sympy as sym
 import math
 
-prog = lines(24)
+prog = read_lines(24)
 
 def validate(number):
     pc = 0

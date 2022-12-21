@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(9)
+inpt = read_lines(9)
 grid = {}
 
 for y, line in enumerate(inpt):

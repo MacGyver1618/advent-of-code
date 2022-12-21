@@ -9,7 +9,7 @@ import numpy as np
 import sympy as sym
 from numpy import array as A
 
-inpt = lines(16)
+inpt = read_lines(16)
 my_idx = inpt.index("your ticket:")
 
 rules = {}

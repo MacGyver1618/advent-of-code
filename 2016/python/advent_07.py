@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(7)
+inpt = read_lines(7)
 
 abbas = [a+b+b+a for a in abc for b in abc if a != b]
 def has_abba(s):

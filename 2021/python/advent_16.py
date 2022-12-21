@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(16)
+inpt = read_lines(16)
 
 stream = "".join(["{:04b}".format(int(x, 16)) for x in inpt[0]])
 versions = 0

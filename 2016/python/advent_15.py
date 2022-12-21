@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = lines(15)
+inpt = read_lines(15)
 discs = set()
 
 for line in inpt:

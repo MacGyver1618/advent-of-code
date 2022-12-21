@@ -8,7 +8,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-inpt = to_nums(lines(7)[0].split(","))
+inpt = to_nums(read_lines(7)[0].split(","))
 
 part1 = min([sum([abs(x-y) for x in inpt]) for y in range(min(inpt), max(inpt)+1)])
 print("Part 1:", part1)

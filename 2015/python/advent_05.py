@@ -1,7 +1,7 @@
 from common.advent_lib import *
 import re
 
-inpt = lines(5)
+inpt = read_lines(5)
 
 def is_nice(s):
     return len(re.findall(r"[aeiou]", s)) >= 3 and re.findall(r"(.)\1", s) and not re.findall(r"(ab|cd|pq|xy)", s)

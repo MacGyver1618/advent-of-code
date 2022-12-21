@@ -1,7 +1,7 @@
 from common.advent_lib import *
 import re
 
-inpt = lines(7)
+inpt = read_lines(7)
 
 def eval():
     L = []
