@@ -4,6 +4,7 @@ from common.advent_lib import *
 import re
 import more_itertools as it2
 import functools as ft
+from collections import defaultdict
 import json
 
 inpt = read_lines(22)[2:]
@@ -20,6 +21,17 @@ for line in inpt:
     nodes.add(node)
     capacities[node[:2]] = node[2:]
 
+R=max(n[1] for n in nodes)+1
+C=max(n[0] for n in nodes)+1
+SIZE=0
+USED=1
+AVAIL=2
+
+grid=defaultdict(tuple)
+for n in sorted(nodes):
+    c,r,s,u,a,_ = n
+    grid[(r,c)]=(s,u,a)
+
 def viable_pairs(ns):
     result = set()
     for a, (_, need, _, used) in ns.items():
@@ -28,42 +40,19 @@ def viable_pairs(ns):
                 result.add((a,b))
     return result
 
-def possible_moves(ns):
-    result = [pair for pair in viable_pairs(ns) if manhattan_distance(*map(ft.partial(it2.take,2), pair)) == 1]
-    return result
-
-data_location = (max(map(second, nodes)), 0)
-
 print("Part 1:", len(viable_pairs(capacities)))
 
-state = (data_location, frozenset(map(tuple, capacities.items())))
+def neighbor_fn(p):
+    r,c=p
+    for n in [(r+1,c),(r-1,c),(r,c+1),(r,c-1)]:
+        nr,nc=n
+        if 0<=nr<R and 0<=nc<C and grid[n][SIZE] < 100:
+            yield n
 
-def neighbors(s):
-    p, caps = s
-    for m in possible_moves(dict(caps)):
-        caps = dict(caps)
-        a, b = m
-        if a == p:
-            p = b
-        a_size, a_used, a_avail, a_pct = caps[a]
-        b_size, b_used, b_avail, b_pct = caps[b]
-        caps[a] = (a_size, 0, a_size, 0)
-        caps[b] = (b_size, a_used + b_used, b_size - a_used - b_used, 100*(a_used + b_used) // b_size)
-        yield p, frozenset(map(tuple, caps.items()))
+data_pos = (0,C-1)
+payload_size = grid[data_pos][USED]
+slot_pos = [(r,c) for r in range(R) for c in range(C) if grid[(r,c)][AVAIL] >= payload_size][0]
+data_path=[(0,c) for c in range(C-2,-1,-1)]
+slot_path=bfs(slot_pos,lambda p: p==data_path[0],neighbor_fn)
 
-def heur_fn(s):
-    a, caps = s
-    max_free = 0
-    t = 0,0
-    for item in caps:
-        print(item)
-        input()
-        b,(_,_,avail,_) = item
-        if avail > max_free:
-            t = b
-    return manhattan_distance(a, (0,0)) + manhattan_distance(a,t)
-
-path = a_star(state, lambda s: s[0] == (0,0), neighbors, lambda x,y: 1, heur_fn)
-part2 = len(path)
-
-print("Part 2:", part2)
+print("Part 2:", len(slot_path)+(len(data_path)-1)*5)
