@@ -20,64 +20,34 @@ def neighbors(blueprint):
     no,ore_ore,clay_ore,obs_ore,obs_clay,geo_ore,geo_obs = blueprint
     def neighbor_fn(state):
         time_left,ore,clay,obsidian,geodes,ore_robots,clay_robots,obsidian_robots,geode_robots = state
+        max_geodes[no] = max(max_geodes[no], geodes)
         if time_left == 0:
-            if geodes > max_geodes[no]:
-                print(f"{no} {geodes}")
-                max_geodes[no] = geodes
             return
         upper_bound = time_left * (time_left + 1) // 2 + geodes
-        if upper_bound < max_geodes[no]:
-            return
+        #if upper_bound < max_geodes[no]:
+        #    return
         if obsidian_robots >= geo_obs and ore_robots >= geo_ore:
             return 0,0,0,0,upper_bound,0,0,0,0
+        next_time = time_left-1
+        most_ore = max(geo_ore, obs_ore, clay_ore, ore_ore)
+        next_ore = min(most_ore, ore+ore_robots)
+        next_clay = min(obs_clay, clay+clay_robots)
+        next_obsidian = min(geo_obs, obsidian+obsidian_robots)
+        next_geodes = geodes+geode_robots
         # to next geode robot
-        if obsidian_robots:
-            ttno = math.ceil(max(geo_ore-ore,0)/ore_robots)
-            ttnobs = math.ceil(max(geo_obs-obsidian,0)/obsidian_robots)
-            ttn = max(ttno, ttnobs)+1
-            next_time = time_left-ttn
-            next_ore = ore+ttn*ore_robots
-            next_clay = clay+ttn*clay_robots
-            next_obsidian = obsidian+ttn*obsidian_robots
-            next_geodes = geodes+ttn*geode_robots
-            if next_time >= 0:
-                yield next_time,next_ore-geo_ore,next_clay,next_obsidian-geo_obs,next_geodes,ore_robots,clay_robots,obsidian_robots,geode_robots+1
+        if ore >= geo_ore and obsidian >= geo_obs:
+            yield next_time,next_ore-geo_ore,next_clay,next_obsidian-geo_obs,next_geodes,ore_robots,clay_robots,obsidian_robots,geode_robots+1
         # to next obsidian robot
-        if clay_robots and obsidian_robots < geo_obs:
-            ttno = math.ceil(max(obs_ore-ore,0)/ore_robots)
-            ttnc = math.ceil(max(obs_clay-clay,0)/clay_robots)
-            ttn = max(ttno, ttnc)+1
-            next_time = time_left-ttn
-            next_ore = ore+ttn*ore_robots
-            next_clay = clay+ttn*clay_robots
-            next_obsidian = obsidian+ttn*obsidian_robots
-            next_geodes = geodes+ttn*geode_robots
-            if next_time >= 0:
-                yield next_time,next_ore-obs_ore,next_clay-obs_clay,next_obsidian,next_geodes,ore_robots,clay_robots,obsidian_robots+1,\
-                    geode_robots
+        if ore >= obs_ore and clay >= obs_clay and obsidian_robots < geo_obs:
+            yield next_time,next_ore-obs_ore,next_clay-obs_clay,next_obsidian,next_geodes,ore_robots,clay_robots,obsidian_robots+1,geode_robots
         # to next clay robot
-        if clay_robots < obs_clay:
-            ttn = math.ceil(max(clay_ore-ore,0)/ore_robots)+1
-            next_time = time_left-ttn
-            next_ore = ore+ttn*ore_robots
-            next_clay = clay+ttn*clay_robots
-            next_obsidian = obsidian+ttn*obsidian_robots
-            next_geodes = geodes+ttn*geode_robots
-            if next_time >= 0:
-                yield next_time,next_ore-clay_ore,next_clay,next_obsidian,next_geodes,ore_robots,clay_robots+1,obsidian_robots,geode_robots
+        if ore >= clay_ore and clay_robots < obs_clay:
+            yield next_time,next_ore-clay_ore,next_clay,next_obsidian,next_geodes,ore_robots,clay_robots+1,obsidian_robots,geode_robots
         # to next ore robot
-        if ore_robots < max(geo_ore, obs_ore, clay_ore, ore_ore):
-            ttn = math.ceil(max(ore_ore-ore,0)/ore_robots)+1
-            next_time = time_left-ttn
-            next_ore = ore+ttn*ore_robots
-            next_clay = clay+ttn*clay_robots
-            next_obsidian = obsidian+ttn*obsidian_robots
-            next_geodes = geodes+ttn*geode_robots
-            if next_time >= 0:
-                yield next_time,next_ore-ore_ore,next_clay,next_obsidian,next_geodes,ore_robots+1,clay_robots,obsidian_robots,geode_robots
+        if ore >= ore_ore and ore_robots < most_ore:
+            yield next_time,next_ore-ore_ore,next_clay,next_obsidian,next_geodes,ore_robots+1,clay_robots,obsidian_robots,geode_robots
         # to end of time
-        yield 0,ore+time_left*ore_robots,clay+time_left*clay_robots,obsidian+time_left*obsidian_robots,geodes+time_left*geode_robots,ore_robots,clay_robots,\
-            obsidian_robots, geode_robots
+        yield next_time,next_ore,next_clay,next_obsidian,next_geodes,ore_robots,clay_robots,obsidian_robots, geode_robots
     return neighbor_fn
 
 start = 24,0,0,0,0,1,0,0,0

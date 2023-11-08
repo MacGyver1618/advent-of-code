@@ -8,30 +8,22 @@ import re
 import more_itertools as it2
 import numpy as np
 import sympy as sym
-nums = [(int(v),i) for i,v in enumerate(read_lines(20))]
-buffer = deque(nums)
-l = len(nums)
-for n in nums:
-    buffer.rotate(-buffer.index(n))
-    num,_ = buffer.popleft()
-    buffer.rotate(-num)
-    buffer.appendleft(n)
+nums = to_nums(read_lines(20))
 
-z = [(v,i) for v,i in nums if v == 0][0]
-buffer.rotate(-buffer.index(z))
-part1 = sum(buffer[n][0] for n in [1000,2000,3000])
-print("Part 1:", part1)
+def solve(numbers, rounds):
+    l = len(numbers)
+    enumerated = [*enumerate(numbers)]
+    Q = deque(enumerated)
+    for _ in range(rounds):
+        for n in enumerated:
+            Q.rotate(-Q.index(n))
+            _,num = Q.popleft()
+            Q.rotate(-num)
+            Q.appendleft(n)
+    vals = [num for _,num in Q]
+    z = vals.index(0)
+    return sum(vals[(z+n)%l] for n in [1000,2000,3000])
 
-nums = [(v*811589153,i) for v,i in nums]
-buffer = deque(nums)
+print("Part 1:", solve(nums, 1))
 
-for _ in range(10):
-    for n in nums:
-        buffer.rotate(-buffer.index(n))
-        num = buffer.popleft()
-        buffer.rotate(-num[0])
-        buffer.appendleft(num)
-
-buffer.rotate(-buffer.index(z))
-part2 = sum(buffer[n][0] for n in [1000,2000,3000])
-print("Part 2:", part2)
+print("Part 2:", solve([n*811589153 for n in nums], 10))
