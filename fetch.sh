@@ -4,6 +4,9 @@ function fetch() {
     day=$1
     day2="$(seq -f %02g $day $day)"
     year=$2
+    if [ ! -d "$year/input" ]; then
+      mkdir -p "$year/input"
+    fi
     curl -s --create-dirs --header "Cookie: $(cat aoc.cookie)" "https://adventofcode.com/$year/day/$day/input" | tee "$year/input/$day2.txt"
 }
 

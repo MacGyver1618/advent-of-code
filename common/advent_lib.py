@@ -8,10 +8,10 @@ from heapdict import heapdict
 from numpy import array as A
 
 def full_input(day):
-    return str(open("../input/%02d.txt" % day).read())
+    return str(open(f"../input/{day:02d}.txt").read())
 
 def read_lines(day):
-    return [line.rstrip() for line in open("../input/%02d.txt" % day).readlines()]
+    return [line.rstrip() for line in open(f"../input/{day:02d}.txt").readlines()]
 
 def to_nums(string_arr):
     return list(map(int, string_arr))
