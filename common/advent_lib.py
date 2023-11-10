@@ -11,7 +11,7 @@ def full_input(day):
     return str(open(f"../input/{day:02d}.txt").read())
 
 def read_lines(day):
-    return [line.rstrip() for line in open(f"../input/{day:02d}.txt").readlines()]
+    return [line[:-1] for line in open(f"../input/{day:02d}.txt").readlines()]
 
 def to_nums(string_arr):
     return list(map(int, string_arr))
@@ -20,7 +20,7 @@ def intersection(iterable):
     return set(func.reduce(set.intersection, [set(i) for i in iterable]))
 
 def union(iterable):
-    return set(func.reduce(set.union, [set(i) for i in iterable]))
+    return set(func.reduce(set.union, [set(i) for i in iterable], set()))
 
 def powerset(iterable):
     s = list(iterable)
