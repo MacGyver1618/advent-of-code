@@ -110,8 +110,7 @@ while drips:
             drips.append((r+1,c))
     if below in "#~":
         for new_drip in expand_horizontal(r,c):
-            if new_drip[0]<=Rmax:
-                drips.append(new_drip)
+            drips.append(new_drip)
 
 # print_grid([max(water_level-20,0),max(water_level+21,41),Cmin,Cmax])
 # _input=input(prompt)
