@@ -1,6 +1,8 @@
 import enum
 from collections import deque, defaultdict
 
+from common.advent_lib import read_lines
+
 
 class AddressMode:
 
@@ -20,7 +22,7 @@ class Status:
 
 class IntCodeMachine:
     def __init__(self, program):
-        self._program = defaultdict(int, {i:v for i,v in enumerate(program)})
+        self._program = defaultdict(int, {i:v for i,v in enumerate(program.copy())})
         self._pc = 0
         self._rb = 0
         self._inputs = deque()
@@ -110,6 +112,9 @@ class IntCodeMachine:
     def val_at(self, position):
         return self._program[position]
 
+    def set_val(self, position, val):
+        self._program[position]=val
+
     def input(self, val):
         self._inputs.append(val)
 
@@ -118,3 +123,7 @@ class IntCodeMachine:
 
     def finished(self):
         return self._status == Status.FINISHED
+
+    @staticmethod
+    def from_day_input(n):
+        return IntCodeMachine([*map(int,read_lines(n)[0].split(","))])
