@@ -118,8 +118,15 @@ class IntCodeMachine:
     def input(self, val):
         self._inputs.append(val)
 
+    def input_line(self, line):
+        self._inputs.extend([ord(c) for c in line])
+        self.input(ord("\n"))
+
     def read(self):
         return self._outputs.popleft()
+
+    def read_all(self):
+        return [self._outputs.popleft() for _ in range(len(self._outputs))]
 
     def finished(self):
         return self._status == Status.FINISHED
