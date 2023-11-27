@@ -102,7 +102,7 @@ public class Advent22 extends Advent {
         continue;
       }
     }
-    start = start.multiply((skip.modPow(shuffles, size).subtract(BigInteger.ONE)).multiply(skip.subtract(BigInteger.ONE).modInverse(size)));
+    start = start.multiply(skip.modPow(shuffles, size).subtract(BigInteger.ONE).multiply(skip.subtract(BigInteger.ONE).modInverse(size)));
     skip = skip.modPow(shuffles, size);
     return BigInteger.valueOf(2020).multiply(skip).add(start).mod(size);
   }

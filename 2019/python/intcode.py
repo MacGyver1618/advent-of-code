@@ -115,8 +115,12 @@ class IntCodeMachine:
     def set_val(self, position, val):
         self._program[position]=val
 
-    def input(self, val):
-        self._inputs.append(val)
+    def input(self, *vals):
+        for val in vals:
+            self._inputs.append(val)
+
+    def inputs_queued(self):
+        return len(self._inputs) > 0
 
     def input_line(self, line):
         self._inputs.extend([ord(c) for c in line])
@@ -125,8 +129,17 @@ class IntCodeMachine:
     def read(self):
         return self._outputs.popleft()
 
+    def read_n(self, n):
+        return [self.read() for _ in range(n)]
+
     def read_all(self):
         return [self._outputs.popleft() for _ in range(len(self._outputs))]
+
+    def read_string(self):
+        return "".join(chr(self._outputs.popleft()) for _ in range(len(self._outputs)))
+
+    def outputs_queued(self):
+        return len(self._outputs) > 0
 
     def finished(self):
         return self._status == Status.FINISHED
