@@ -1,14 +1,29 @@
-# Advent of Code 2018
+# Advent of Code
 
-These are my solutions for AoC 2018, done in Java on Windows.
+I started this repo in 2018. I started Advent of Code in 2015 when it first launched,
+but put my solutions online only in 2018. I did Java only 2015-2017, and in 2018 I started 
+doing Python and Clojure alongside Java. I switched to fully Python in 2020.
 
 ## Scaffolding
 
-The entrypoint is `advent.bat`. It takes 0..n arguments, each of which corresponds
-to a day. It then compiles and runs all of the specified days, or all in the
-range 1..25, if the argument list is empty.
+I primarily run these in IntelliJ IDEA, but there's a shell script `fetch.sh` that fetches
+the input using the syntax `./fetch.sh <year> <day>`. It requires the session cookie stored
+in the root directory as `aoc.cookie`.
 
 ## Utility functions
+
+### Python
+
+Some of the stuff is based on Python 3.7 so e.g. `advent_lib.product` is redundant
+as `math.prod` replaced it, but I haven't gotten around to removing the old stuff. 
+
+*`read_lines(day_number)`* does pretty much what you'd expect, reads the input file
+and tokenizes it to lines separated by `\n`.
+
+Other useful ones like general-purpose search algorithms `bfs`, `dfs`, `dijkstra`,
+`a_star`
+
+### Java
 
 These are mainly used for debugging purposes. Most of them are just less verbose
 shorthands for Java standard library methods.
