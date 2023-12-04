@@ -41,10 +41,7 @@ def empty_grid():
     return [["."] * 5 for _ in range(5)]
 
 state=[empty_grid(),original_grid,empty_grid()]
-def spinning_cursor():
-    while True:
-        for cursor in "-\\|/":
-            yield cursor
+
 def print_grids(state):
     for d in range(len(state)):
         print(f"Depth {-(len(state)//2)+d}")
@@ -56,12 +53,9 @@ def print_grids(state):
         print()
 
 EMPTY=empty_grid()
-spin_iter=spinning_cursor()
-sys.stdout.write(next(spin_iter))
+progressbar=ProgressBar(200)
 for i in range(200):
-    sys.stdout.write("\r")
-    sys.stdout.write(next(spin_iter))
-    sys.stdout.flush()
+    progressbar.update()
     next_state=[empty_grid() for _ in range(len(state))]
     L=len(next_state)
     for d in range(L):
@@ -99,9 +93,7 @@ for i in range(200):
         next_state=[*next_state,empty_grid()]
     state=next_state
 
-sys.stdout.write("\r")
-sys.stdout.flush()
-
+progressbar.clear()
 
 part2=sum(1 for grid in state for line in grid for cell in line if cell=="#")
 print("Part 2:", part2)

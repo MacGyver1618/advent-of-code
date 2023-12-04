@@ -4,6 +4,8 @@ import itertools as it
 import operator as op
 import queue
 
+import math
+import sys
 from heapdict import heapdict
 from numpy import array as A
 
@@ -198,3 +200,57 @@ def extract_subtree(graph, subtree_root):
                 result.add((a,b))
                 Q.append(a)
     return result
+
+class Spinner:
+
+    @staticmethod
+    def _spinning_cursor():
+        while True:
+            for cursor in "-\\|/":
+                yield cursor
+
+    def __init__(self):
+        self._generator=Spinner._spinning_cursor()
+        self._started=False
+
+    def spin(self):
+        if not self._started:
+            self._started=True
+        else:
+            sys.stdout.write("\r")
+        sys.stdout.write(next(self._generator))
+        sys.stdout.flush()
+
+    def stop(self):
+        self._started=False
+        sys.stdout.write("\r")
+        sys.stdout.flush()
+
+class ProgressBar:
+
+    def __init__(self, capacity):
+        self._capacity=capacity
+        self._progress=0
+        self._started=False
+
+    def update(self):
+        if not self._started:
+            sys.stdout.write("\r")
+        else:
+            self._started=True
+        self._progress+=1
+        tics=(self._progress*50)//self._capacity
+        if self._progress <= self._capacity:
+            sys.stdout.write(f"[{'='*tics}{' '*(50-tics)}]")
+        else:
+            message=f"*** OVERFLOW {self._progress}/{self._capacity} ***"
+            l=50-len(message)
+            head=math.floor(l/2)
+            tail=math.ceil(l/2)
+            sys.stdout.write(f"[{head*' '}{message}{tail*' '}]")
+        sys.stdout.flush()
+
+    def clear(self):
+        self._started=False
+        sys.stdout.write(f"\r{' '*52}\r")
+        sys.stdout.flush()
