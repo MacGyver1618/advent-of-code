@@ -1,5 +1,9 @@
 import collections
 import functools as func
+import os
+import subprocess
+from datetime import datetime
+
 import itertools as it
 import operator as op
 import queue
@@ -9,11 +13,23 @@ import sys
 from heapdict import heapdict
 from numpy import array as A
 
+def get_day(day):
+    file_path=f"../input/{day:02d}.txt"
+    file_present=os.path.exists(file_path)
+    year=os.getcwd().split("/")[-2]
+    day_unlock_time=datetime.fromisoformat(f"{year}-12-{day:02d}T07:00:00")
+    day_unlocked = datetime.now() > day_unlock_time
+    if day_unlocked and not file_present:
+        subprocess.run(["./fetch.sh", year, str(day)], shell=True, cwd="../..", capture_output=False)
+    elif not file_present:
+        raise ValueError(f"{year} day {day} not unlocked yet!")
+    return open(file_path)
+
 def full_input(day):
-    return str(open(f"../input/{day:02d}.txt").read())
+    return str(get_day(day).read())
 
 def read_lines(day):
-    return [line[:-1] for line in open(f"../input/{day:02d}.txt").readlines()]
+    return [line[:-1] for line in get_day(day).readlines()]
 
 def to_nums(string_arr):
     return list(map(int, string_arr))
@@ -231,24 +247,27 @@ class ProgressBar:
     def __init__(self, capacity):
         self._capacity=capacity
         self._progress=0
+        self._tics=0
         self._started=False
 
     def update(self):
         if not self._started:
-            sys.stdout.write("\r")
-        else:
             self._started=True
+            sys.stdout.write(f"[{' '*50}]")
         self._progress+=1
         tics=(self._progress*50)//self._capacity
-        if self._progress <= self._capacity:
-            sys.stdout.write(f"[{'='*tics}{' '*(50-tics)}]")
-        else:
-            message=f"*** OVERFLOW {self._progress}/{self._capacity} ***"
-            l=50-len(message)
-            head=math.floor(l/2)
-            tail=math.ceil(l/2)
-            sys.stdout.write(f"[{head*' '}{message}{tail*' '}]")
-        sys.stdout.flush()
+        if tics>self._tics:
+            self._tics=tics
+            sys.stdout.write("\r")
+            if self._progress <= self._capacity:
+                sys.stdout.write(f"[{'='*tics}{' '*(50-tics)}]")
+            else:
+                message=f"*** OVERFLOW {self._progress}/{self._capacity} ***"
+                l=50-len(message)
+                head=math.floor(l/2)
+                tail=math.ceil(l/2)
+                sys.stdout.write(f"[{head*' '}{message}{tail*' '}]")
+            sys.stdout.flush()
 
     def clear(self):
         self._started=False
