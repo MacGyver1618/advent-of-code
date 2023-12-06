@@ -23,7 +23,10 @@ grid[pos]=" "
 seen = set()
 Q=deque([(0,d) for d in dirs[-1:0:-1]])
 
+printed=False
+
 def print_grid():
+    global printed
     ss=[]
     for r in range(-21,20):
         s=""
@@ -36,6 +39,10 @@ def print_grid():
             else:
                 s+="?"
         ss+=[s]
+    if printed:
+        sys.stdout.write("\033[F"*41)
+    else:
+        printed=True
     print("\n".join(ss))
 
 # print_grid()
@@ -69,6 +76,7 @@ oxygen_machine=[k for k,v in grid.items() if v=="O"][0]
 path=bfs(0,eq(oxygen_machine),lambda p: [p+d for d in dirs[1:] if p+d in grid and grid[p+d]!="#"])
 part1 = len(path)-1
 print("Part 1:", part1)
+printed=False
 
 minutes=0
 Q=deque([oxygen_machine])
