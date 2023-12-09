@@ -3,6 +3,7 @@ import functools as func
 import os
 import subprocess
 from datetime import datetime
+from time import time
 
 import itertools as it
 import operator as op
@@ -216,6 +217,25 @@ def extract_subtree(graph, subtree_root):
                 result.add((a,b))
                 Q.append(a)
     return result
+
+def timed(fn):
+    start = time()
+    result = fn()
+    end = time()
+    return end-start, result
+
+def pretty_time(seconds):
+    if seconds > 60:
+        return f"{seconds//60} m {int(seconds%60)} s"
+    if seconds > 1:
+        return f"{round(seconds, 2)} s"
+    nanos=int(seconds*1e9)
+    if nanos > 1_000_000:
+        return f"{nanos//1_000_000} ms"
+    if nanos > 1_000:
+        return f"{nanos//1_000} µs"
+    return f"{nanos} ns"
+
 
 class Spinner:
 
