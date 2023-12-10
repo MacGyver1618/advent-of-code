@@ -3,7 +3,7 @@ import functools as func
 import os
 import subprocess
 from datetime import datetime
-from time import time
+import time
 
 import itertools as it
 import operator as op
@@ -129,6 +129,7 @@ def dfs(start, goal_fn, neighbor_fn):
                 came_from[neighbor] = node
                 seen.add(neighbor)
                 Q.append(neighbor)
+    return seen
 
 def dijkstra(start, goal_fn, neighbor_fn, dist_fn):
     dist = collections.defaultdict(lambda: float("inf"))
@@ -182,6 +183,11 @@ def eq(const):
         return p == const
     return is_equal
 
+def flip(fn):
+    def flipped(a,b):
+       return fn(b,a)
+    return flipped
+
 def toposort(edges):
     nodes = set()
     incoming_nodes = collections.defaultdict(list)
@@ -219,9 +225,9 @@ def extract_subtree(graph, subtree_root):
     return result
 
 def timed(fn):
-    start = time()
+    start = time.time()
     result = fn()
-    end = time()
+    end = time.time()
     return end-start, result
 
 def pretty_time(seconds):
