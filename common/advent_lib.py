@@ -242,6 +242,17 @@ def pretty_time(seconds):
         return f"{nanos//1_000} µs"
     return f"{nanos} ns"
 
+def find_nth_in_cycle(latest,history,nth):
+    offset=history.index(latest)
+    cycle_length=len(history)-offset
+    phase = (nth-offset)%cycle_length
+    return history[phase+offset]
+
+def cycle_until_nth(state, iterate, nth):
+    history=[state]
+    while (state:=iterate(state)) not in history:
+        history+=[state]
+    return find_nth_in_cycle(state,history,nth)
 
 class Spinner:
 
@@ -299,3 +310,8 @@ class ProgressBar:
         self._started=False
         sys.stdout.write(f"\r{' '*52}\r")
         sys.stdout.flush()
+
+    def reset(self):
+        self._tics=0
+        self._progress=0
+        self._started=False
