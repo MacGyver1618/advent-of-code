@@ -21,7 +21,7 @@ def get_day(day):
     day_unlock_time=datetime.fromisoformat(f"{year}-12-{day:02d}T07:00:00")
     day_unlocked = datetime.now() > day_unlock_time
     if day_unlocked and not file_present:
-        subprocess.run(["./fetch.sh", year, str(day)], shell=True, cwd="../..", capture_output=False)
+        subprocess.run(["./fetch.sh", year, str(day)], shell=True, cwd="../..", capture_output=True)
     elif not file_present:
         raise ValueError(f"{year} day {day} not unlocked yet!")
     return open(file_path)
