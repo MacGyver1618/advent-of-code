@@ -95,7 +95,7 @@ def reconstruct_path(node, came_from):
     while node in came_from:
         node = came_from[node]
         path.appendleft(node)
-    return path
+    return [*path]
 
 def bfs(start, goal_fn, neighbor_fn):
     Q = collections.deque()
@@ -182,6 +182,12 @@ def eq(const):
     def is_equal(p):
         return p == const
     return is_equal
+
+def true(*_):
+    return True
+
+def false(*_):
+    return False
 
 def flip(fn):
     def flipped(a,b):
