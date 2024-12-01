@@ -1,6 +1,7 @@
 import collections
 import functools as func
 import os
+import re
 import subprocess
 from datetime import datetime
 import time
@@ -34,6 +35,18 @@ def read_lines(day):
 
 def to_nums(string_arr):
     return list(map(int, string_arr))
+
+def read_grid(day):
+    lines = read_lines(day)
+    R = len(lines)
+    C = len(lines[0])
+    return R, C, [[c for c in line] for line in lines]
+
+def parse_ints(line):
+    return [int(d) for d in re.findall(r"\d+", line)]
+
+def parse_floats(line):
+    return [float(d) for d in re.findall(r"\d+(?:\.\d+)?", line)]
 
 def intersection(iterable):
     return set(func.reduce(set.intersection, [set(i) for i in iterable]))

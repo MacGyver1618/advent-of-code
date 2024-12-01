@@ -11,10 +11,7 @@ import more_itertools as it2
 import numpy as np
 import sympy as sym
 
-lines = read_lines(14)
-grid = [[c for c in line] for line in lines]
-R=len(grid)
-C=len(grid[0])
+R, C, grid = read_grid(14)
 rs=[r for r in range(R)]
 cs=[c for c in range(C)]
 
@@ -54,7 +51,7 @@ north()
 part1 = sum(R-r for r in rs for c in cs if grid[r][c]=="O")
 print("Part 1:", part1)
 
-grid = [[c for c in line] for line in lines]
+*_,grid = read_grid(14)
 
 def cycle(_):
     north()
