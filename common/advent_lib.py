@@ -305,10 +305,13 @@ class ProgressBar:
         self._progress=0
         self._tics=0
         self._started=False
+        self._start_time=None
+        self._elapsed=0
 
     def update(self):
         if not self._started:
             self._started=True
+            self._start_time=time.time()
             sys.stdout.write(f"[{' '*50}]")
         self._progress+=1
         tics=(self._progress*50)//self._capacity
@@ -316,7 +319,7 @@ class ProgressBar:
             self._tics=tics
             sys.stdout.write("\r")
             if self._progress <= self._capacity:
-                sys.stdout.write(f"[{'='*tics}{' '*(50-tics)}]")
+                sys.stdout.write(f"[{'='*tics}{' '*(50-tics)}] {self.time_taken()}")
             else:
                 message=f"*** OVERFLOW {self._progress}/{self._capacity} ***"
                 l=50-len(message)
@@ -329,6 +332,9 @@ class ProgressBar:
         self._started=False
         sys.stdout.write(f"\r{' '*52}\r")
         sys.stdout.flush()
+
+    def time_taken(self):
+        return time.time()-self._start_time
 
     def reset(self):
         self._tics=0
