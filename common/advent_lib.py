@@ -251,7 +251,7 @@ def timed(fn):
 
 def pretty_time(seconds):
     if seconds > 60:
-        return f"{seconds//60} m {int(seconds%60)} s"
+        return f"{int(seconds//60)} m {int(seconds%60)} s"
     if seconds > 1:
         return f"{round(seconds, 2)} s"
     nanos=int(seconds*1e9)
@@ -309,28 +309,32 @@ class ProgressBar:
         self._elapsed=0
 
     def update(self):
+        sys.stdout.write("\033[?25l")
         if not self._started:
             self._started=True
             self._start_time=time.time()
             sys.stdout.write(f"[{' '*50}]")
         self._progress+=1
         tics=(self._progress*50)//self._capacity
+        sys.stdout.write(f"\r\033[53C {pretty_time(self.time_taken())}\033[K")
         if tics>self._tics:
             self._tics=tics
             sys.stdout.write("\r")
             if self._progress <= self._capacity:
-                sys.stdout.write(f"[{'='*tics}{' '*(50-tics)}] {self.time_taken()}")
+                sys.stdout.write(f"[{'='*tics}{' '*(50-tics)}]")
             else:
                 message=f"*** OVERFLOW {self._progress}/{self._capacity} ***"
                 l=50-len(message)
                 head=math.floor(l/2)
                 tail=math.ceil(l/2)
                 sys.stdout.write(f"[{head*' '}{message}{tail*' '}]")
+
+            sys.stdout.write("\033[?25h")
             sys.stdout.flush()
 
     def clear(self):
         self._started=False
-        sys.stdout.write(f"\r{' '*52}\r")
+        sys.stdout.write("\r\033[K")
         sys.stdout.flush()
 
     def time_taken(self):
