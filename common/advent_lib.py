@@ -344,3 +344,27 @@ class ProgressBar:
         self._tics=0
         self._progress=0
         self._started=False
+
+class Grid:
+    def __init__(self, lines):
+        self.R = len(lines)
+        self.C = len(lines[0])
+        self.raw_grid = [[c for c in line] for line in lines]
+
+    def in_bounds(self, point):
+        r,c=point
+        return 0 <= r < self.R and 0 <= c < self.C
+
+    def char_at(self, point):
+        r,c=point
+        return self.raw_grid[r][c]
+
+    def points(self):
+        for r in range(self.R):
+            for c in range(self.C):
+                yield r,c
+
+    def items(self):
+        for r in range(self.R):
+            for c in range(self.C):
+                yield (r,c),self.raw_grid[r][c]
