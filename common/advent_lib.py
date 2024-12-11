@@ -127,6 +127,21 @@ def bfs(start, goal_fn, neighbor_fn):
                 Q.append(neighbor)
     return seen
 
+def all_paths(start, goal_fn, neighbor_fn):
+    Q = collections.deque([[start]])
+    paths = []
+    while Q:
+        path = Q.popleft()
+        pos = path[-1]
+
+        if goal_fn(pos):
+            paths+=[path]
+        else:
+            for n in neighbor_fn(pos):
+                if n not in path:
+                    Q.append(path+[n])
+    return paths
+
 def dfs(start, goal_fn, neighbor_fn):
     Q = collections.deque()
     seen = set()
@@ -309,8 +324,8 @@ class ProgressBar:
         self._elapsed=0
 
     def update(self):
-        sys.stdout.write("\033[?25l")
         if not self._started:
+            sys.stdout.write("\033[?25l")
             self._started=True
             self._start_time=time.time()
             sys.stdout.write(f"[{' '*50}]")
@@ -328,13 +343,11 @@ class ProgressBar:
                 head=math.floor(l/2)
                 tail=math.ceil(l/2)
                 sys.stdout.write(f"[{head*' '}{message}{tail*' '}]")
-
-            sys.stdout.write("\033[?25h")
-            sys.stdout.flush()
+        sys.stdout.flush()
 
     def clear(self):
         self._started=False
-        sys.stdout.write("\r\033[K")
+        sys.stdout.write("\r\033[K\033[?25h")
         sys.stdout.flush()
 
     def time_taken(self):
@@ -359,6 +372,9 @@ class Grid:
         r,c=point
         return self.raw_grid[r][c]
 
+    def int_at(self, point):
+        return int(self.char_at(point))
+
     def points(self):
         for r in range(self.R):
             for c in range(self.C):
@@ -368,3 +384,8 @@ class Grid:
         for r in range(self.R):
             for c in range(self.C):
                 yield (r,c),self.raw_grid[r][c]
+
+    def neighbors(self, p):
+        for n in adjacent(p):
+            if self.in_bounds(n):
+                yield n
