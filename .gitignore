@@ -7,3 +7,4 @@ __pycache__
 out
 2020/lib
 venv
+.DS_Store
