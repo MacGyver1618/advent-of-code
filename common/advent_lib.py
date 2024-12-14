@@ -43,7 +43,7 @@ def read_grid(day):
     return R, C, [[c for c in line] for line in lines]
 
 def parse_ints(line):
-    return [int(d) for d in re.findall(r"\d+", line)]
+    return [int(d) for d in re.findall(r"-?\d+", line)]
 
 def parse_floats(line):
     return [float(d) for d in re.findall(r"\d+(?:\.\d+)?", line)]
