@@ -211,6 +211,9 @@ def eq(const):
         return p == const
     return is_equal
 
+def const(val):
+    return lambda *_: val
+
 def true(*_):
     return True
 
@@ -370,7 +373,13 @@ class Grid:
 
     def char_at(self, point):
         r,c=point
+        if not self.in_bounds(point):
+            return None
         return self.raw_grid[r][c]
+
+    def place(self, point, val):
+        r,c=point
+        self.raw_grid[r][c]=val
 
     def int_at(self, point):
         return int(self.char_at(point))
@@ -389,3 +398,18 @@ class Grid:
         for n in adjacent(p):
             if self.in_bounds(n):
                 yield n
+
+    def print(self, custom_points={}, header=None, highlights={}):
+        if header:
+            print(header)
+        ss=[]
+        for r in range(self.R):
+            s=""
+            for c in range(self.C):
+                point = custom_points[(r,c)] if (r,c) in custom_points else self.raw_grid[r][c]
+                if highlights and point in highlights:
+                    s+=f"\033[{highlights[point]}m{point}\033[39m"
+                else:
+                    s+=point
+            ss+=[s]
+        print("\n".join(ss))
