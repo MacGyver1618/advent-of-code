@@ -51,7 +51,6 @@ prev = defaultdict(list)
 while Q:
     u,_ = Q.popitem()
     if u[:2]==end:
-        print(f"got to end from {prev[u]}")
         continue
     for v in neighbors(u):
         alt = dist[u] + cost(u,v)
