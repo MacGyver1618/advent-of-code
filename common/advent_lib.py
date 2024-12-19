@@ -384,6 +384,9 @@ class Grid:
     def int_at(self, point):
         return int(self.char_at(point))
 
+    def float_at(self, point):
+        return float(self.char_at(point))
+
     def points(self):
         for r in range(self.R):
             for c in range(self.C):
