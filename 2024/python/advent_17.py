@@ -35,8 +35,14 @@ part1 = ",".join(str(v) for v in run(a_part_1))
 
 print("Part 1:", part1)
 
+hi=0
+print(",".join(str(v) for v in program))
 def neighbors(p):
     num,digits=p
+    global hi
+    if digits > hi:
+        hi=digits
+        print(f"\r{','.join(str(v) for v in run(num)[:digits])}\033[K", end="")
     if digits==16:
         return
     prefix=program[:digits+1]
@@ -45,6 +51,6 @@ def neighbors(p):
         attempt = run(n)
         if attempt[:digits+1] == prefix:
             yield n,digits+1
-
 part2=min(p for (p,n) in bfs((0,0),false,neighbors) if n == 16)
+print()
 print("Part 2:", part2)

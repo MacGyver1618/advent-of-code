@@ -334,7 +334,10 @@ class ProgressBar:
             sys.stdout.write(f"[{' '*50}]")
         self._progress+=1
         tics=(self._progress*50)//self._capacity
-        sys.stdout.write(f"\r\033[53C {pretty_time(self.time_taken())}\033[K")
+        time_passed=time.time()
+        if time_passed-self._elapsed > 1:
+            sys.stdout.write(f"\r\033[53C {pretty_time(int(self.time_taken()))}\033[K")
+            self._elapsed=time_passed
         if tics>self._tics:
             self._tics=tics
             sys.stdout.write("\r")
